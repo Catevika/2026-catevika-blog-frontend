@@ -16,12 +16,21 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "@hugeicons/core-free-icons": "^4.1.1",
+    "@hugeicons/react": "^1.1.6",
     "@tailwindcss/vite": "^4.2.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "jsdom": "^29.0.2",
+    "radix-ui": "^1.4.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router": "^7.14.1",
-    "tailwindcss": "^4.2.2"
+    "shadcn": "^4.3.0",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.2",
+    "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
