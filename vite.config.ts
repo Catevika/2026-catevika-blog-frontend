@@ -2,6 +2,7 @@ import { defineConfig } from "vitest/config";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
+import path from "node:path";
 
 export default defineConfig(({ mode }) => {
   const isTest: boolean = mode === "test";
@@ -30,6 +31,12 @@ export default defineConfig(({ mode }) => {
       setupFiles: "./tests/setup.ts",
       include: ["tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
       css: false,
+    },
+
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
     },
   };
 });
