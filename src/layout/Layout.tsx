@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
-import BackTopButton from "../components/BackToTopButton";
-import NavBar from "../components/NavBar";
+import BackTopButton from "@/components/BackToTopButton";
+import NavBar from "@/components/NavBar";
 
 export default function Layout() {
   return (

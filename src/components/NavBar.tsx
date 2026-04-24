@@ -1,7 +1,7 @@
-import CatevikaLogo from "./CatevikaLogo";
-import LogInButton from "./LogInButton";
-import LogOutButton from "./LogOutButton";
-import ThemeButton from "./ThemeButton";
+import CatevikaLogo from "@/components/CatevikaLogo";
+import LogInButton from "@/components/LogInButton";
+import LogOutButton from "@/components/LogOutButton";
+import ThemeButton from "@/components/ThemeButton";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -9,10 +9,13 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "./ui/navigation-menu";
+} from "@/components/ui/navigation-menu";
+import { useAuthStore } from "@/stores/authStore";
+import { useLocation } from "react-router";
 
 export default function NavBar() {
-  const isAuthenticated = true;
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const location = useLocation();
 
   return (
     <nav
@@ -39,7 +42,11 @@ export default function NavBar() {
 
         <div className="flex items-center">
           <ThemeButton />
-          {isAuthenticated ? <LogOutButton /> : <LogInButton />}
+          {isAuthenticated ? (
+            <LogOutButton />
+          ) : (
+            location.pathname !== "/auth" && <LogInButton />
+          )}
         </div>
       </div>
     </nav>

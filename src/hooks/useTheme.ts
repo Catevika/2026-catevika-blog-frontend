@@ -11,7 +11,7 @@ export function useTheme(): {
   const getInitialTheme = (): Theme => {
     const storedTheme = localStorage.getItem("theme");
     if (storedTheme && (storedTheme === "light" || storedTheme === "dark")) {
-      return storedTheme as Theme;
+      return storedTheme;
     }
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"

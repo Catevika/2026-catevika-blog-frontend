@@ -1,10 +1,10 @@
+import { useAuthStore } from "@/stores/authStore";
 import { BiLogInCircle } from "react-icons/bi";
+import { useNavigate } from "react-router";
 
 export default function LogInButton() {
-  const isAuthenticated = true;
-  const handleLogin = () => {
-    return null;
-  };
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const navigate = useNavigate();
 
   if (isAuthenticated) return null;
 
@@ -13,8 +13,10 @@ export default function LogInButton() {
       {/* Desktop */}
       <button
         type="button"
-        onClick={handleLogin}
-        className="duration-200 hover:opacity-70 transition-opacity cursor-pointer border-transparent! bg-transparent! p-2 font-medium hover:bg-transparent! hidden md:inline"
+        onClick={() => {
+          void navigate("/auth");
+        }}
+        className="duration-200 hover:opacity-70 transition-opacity cursor-pointer border-transparent! bg-transparent! p-2 font-medium hover:bg-transparent! hidden sm:inline"
         title="Go to login page"
         aria-label="Go to login page"
       >
@@ -24,8 +26,10 @@ export default function LogInButton() {
       {/* Mobile */}
       <button
         type="button"
-        onClick={handleLogin}
-        className="duration-200 hover:opacity-70 transition-opacity cursor-pointer border-transparent! bg-transparent! p-2 font-medium hover:bg-transparent! inline md:hidden"
+        onClick={() => {
+          void navigate("/auth");
+        }}
+        className="duration-200 hover:opacity-70 transition-opacity cursor-pointer border-transparent! bg-transparent! p-2 font-medium hover:bg-transparent! inline sm:hidden"
         title="Go to login page"
         aria-label="Go to login page"
       >

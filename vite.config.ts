@@ -21,6 +21,15 @@ export default defineConfig(({ mode }) => {
             "/api": {
               target: "http://localhost:4000",
               changeOrigin: true,
+              configure: (proxy) => {
+                proxy.on("proxyRes", (proxyRes) => {
+                  // Log to confirm the header is preserved
+                  const retry = proxyRes.headers["retry-after"];
+                  if (retry) {
+                    console.log("Proxy forwarding Retry-After:", retry);
+                  }
+                });
+              },
             },
           },
     },

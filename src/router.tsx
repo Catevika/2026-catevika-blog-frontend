@@ -1,15 +1,28 @@
 import { createBrowserRouter } from "react-router";
-import Dashboard from "./pages/Dashboard";
-import Layout from "./layout/Layout";
+import InitializeAuth from "@/components/InitializeAuth";
+
+import Auth from "@/pages/Auth";
+import Dashboard from "@/pages/Dashboard";
+import Layout from "@/layout/Layout";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import PostEdit from "@/pages/PostEdit";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Layout />,
+    element: <InitializeAuth />, // runs on every load />,
     children: [
       {
-        index: true,
-        element: <Dashboard />,
+        element: <Layout />, // runs on every load />,
+        children: [
+          // PUBLIC ROUTES
+          { path: "/", element: <Dashboard /> },
+          { path: "/auth", element: <Auth /> },
+          // PROTECTED
+          {
+            element: <ProtectedRoute />,
+            children: [{ path: "/posts/new", element: <PostEdit /> }],
+          },
+        ],
       },
     ],
   },

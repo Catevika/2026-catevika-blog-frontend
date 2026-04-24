@@ -8,9 +8,10 @@ import {
 } from "@/components/ui/item";
 import { Link } from "react-router";
 import { SlArrowRight } from "react-icons/sl";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function Dashboard() {
-  const isAuthenticated = true;
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
     <section className="relative md:w-2xl md:h-2xl">
@@ -75,10 +76,12 @@ export default function Dashboard() {
             </ItemHeader>
           </ItemContent>
           <ItemActions>
-            <Button variant="default" size="lg">
-              {isAuthenticated ? "Start Writing Now" : "Create an Account"}
-              <SlArrowRight />
-            </Button>
+            <Link to="/posts/new">
+              <Button variant="default" size="lg">
+                {isAuthenticated ? "Start Writing Now" : "Create an Account"}
+                <SlArrowRight />
+              </Button>
+            </Link>
           </ItemActions>
         </Item>
       </div>

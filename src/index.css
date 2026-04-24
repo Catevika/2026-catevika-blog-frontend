@@ -131,7 +131,6 @@ h1,
 h2 {
   font-family: var(--heading);
   font-weight: 500;
-  color: var(--text-h);
 }
 
 code,
@@ -229,6 +228,29 @@ code {
 @layer base {
   body {
     @apply bg-background text-foreground;
+
+    /* Chrome, Edge, Opera */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+      display: none;
+    }
+
+    input[type="password"]::-webkit-credentials-auto-fill-button {
+      display: none !important;
+      visibility: hidden;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    /* Firefox */
+    input[type="password"]::-moz-password-toggle {
+      display: none;
+    }
+
+    /* Safari */
+    input[type="password"]::-webkit-textfield-decoration-container {
+      display: none;
+    }
 
     & ::-webkit-scrollbar {
     display: none;
