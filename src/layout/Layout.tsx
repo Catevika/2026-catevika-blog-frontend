@@ -4,9 +4,9 @@ import NavBar from "@/components/NavBar";
 
 export default function Layout() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen max-w-5xl px-2 pt-2 md:px-4">
+    <div className="flex flex-col items-center justify-center max-w-5xl min-h-screen px-2 pt-2 md:px-4">
       <NavBar />
-      <main className="flex-1 overflow-y-auto pt-15">
+      <main className="flex-1 w-full mx-auto overflow-y-auto pt-15">
         <Outlet />
         <BackTopButton />
       </main>

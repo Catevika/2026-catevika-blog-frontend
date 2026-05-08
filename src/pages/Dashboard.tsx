@@ -14,7 +14,7 @@ export default function Dashboard() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
-    <section className="relative md:w-2xl md:h-2xl">
+    <section className="relative w-auto h-auto max-w-5xl mx-auto max-h-150 grow">
       <figure className="flex flex-col items-center justify-center">
         <img
           src="assets/windows-11-bloom-light-variants-v1.png"
@@ -35,28 +35,30 @@ export default function Dashboard() {
           </Link>
         </figcaption>
       </figure>
-      <div className="block m-5 md:absolute md:inset-0 md:flex md:flex-col md:items-center md:flex-wrap">
-        <div className="md:pb-25">
+      <div className="block m-5 sm:absolute sm:inset-0 sm:flex sm:flex-col sm:items-center sm:flex-wrap">
+        <div className="sm:pb-25 dark:text-secondary">
           <TypographyH1>Welcome&nbsp;to&nbsp;my Tech&nbsp;Blog!</TypographyH1>
         </div>
         <Item
           variant="default"
-          className="md:bg-background/20 md:dark:bg-foreground/20 md:backdrop-blur-md"
+          className="sm:bg-background/20 sm:dark:bg-foreground/20 sm:backdrop-blur-md"
         >
           <ItemContent>
-            <ItemHeader className="text-xl font-semibold md:dark:text-background">
+            <ItemHeader className="text-xl font-semibold sm:dark:text-background">
               Read&nbsp;Ultra&nbsp;Expert&nbsp;Posts!
             </ItemHeader>
           </ItemContent>
           <ItemActions>
-            <Button variant="default" size="lg">
-              {isAuthenticated ? "Start Reading Now" : "No account needed"}
-              <SlArrowRight />
-            </Button>
+            <Link to="/posts">
+              <Button variant="default" size="lg">
+                {isAuthenticated ? "Start Reading Now" : "No account needed"}
+                <SlArrowRight />
+              </Button>
+            </Link>
           </ItemActions>
         </Item>
         <div
-          className="hidden md:flex md:w-full md:items-center md:justify-center md:gap-4 md:px-8 md:py-8"
+          className="hidden sm:flex sm:w-full sm:items-center sm:justify-center sm:gap-4 sm:px-8 sm:py-8"
           aria-hidden="true"
           role="separator"
         >
@@ -68,10 +70,10 @@ export default function Dashboard() {
         </div>
         <Item
           variant="default"
-          className="md:bg-background/20 md:dark:bg-foreground/20 md:backdrop-blur-md"
+          className="sm:bg-background/20 sm:dark:bg-foreground/20 sm:backdrop-blur-md"
         >
           <ItemContent>
-            <ItemHeader className="text-xl font-semibold md:dark:text-background">
+            <ItemHeader className="text-xl font-semibold sm:dark:text-background">
               Write&nbsp;Meaningful&nbsp;Posts!
             </ItemHeader>
           </ItemContent>

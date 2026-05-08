@@ -36,7 +36,7 @@ export default function BackTopButton({
     <button
       type="button"
       onClick={scrollToTop}
-      className="fixed z-50 p-3 transition-opacity duration-200 rounded-full shadow-lg cursor-pointer bg-primary hover:opacity-70 right-6 bottom-6"
+      className="fixed z-50 p-2 transition-opacity duration-200 rounded-full shadow-lg cursor-pointer bg-primary hover:opacity-70 right-6 bottom-6 text-primary-foreground"
       aria-label="Go back to top"
     >
       <PiArrowUp size={24} />
