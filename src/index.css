@@ -117,6 +117,12 @@
   }
 }
 
+body::-webkit-scrollbar {
+    display: none;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
 #root {
   width: 1024px;
   max-width: 100%;
@@ -131,6 +137,15 @@ h1,
 h2 {
   font-family: var(--heading);
   font-weight: 500;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  scroll-margin-top: 90px;
 }
 
 code,
@@ -256,7 +271,27 @@ code {
     display: none;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+    }
   }
-  }
+
   html {
-    @apply font-sans overflow-x-hidden overflow-y-scroll scroll-smooth;}}
+    @apply font-sans overflow-x-hidden overflow-y-scroll scroll-smooth;
+  }
+
+  /* replace the editor text color for code - light mode */
+  .light p code, .light code .code-line {
+    color: #16171d !important;
+  }
+
+  #post-content{
+    /* replace the editor background */
+    & .wmde-markdown-color {
+      background-color: transparent !important;
+    }
+
+    /* center image and caption */
+    & div > img + p {
+      @apply flex justify-center items-center w-full gap-2;
+    }
+  }
+}

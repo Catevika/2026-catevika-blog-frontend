@@ -19,10 +19,10 @@ export default function NavBar() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 px-2 pt-2 md:px-4 bg-card/50 z-100 backdrop-blur-md shrink-0 max-w-5xl mx-auto"
+      className="fixed top-0 left-0 right-0 px-2 pt-2 mx-auto md:px-4 bg-card/50 z-100 backdrop-blur-md shrink-0"
       aria-label="Main navigation"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between max-w-5xl mx-auto">
         <CatevikaLogo />
 
         <NavigationMenu className="hidden w-57 sm:block">
@@ -34,6 +34,12 @@ export default function NavBar() {
               <NavigationMenuContent>
                 <NavigationMenuLink href="/" className="rounded-xs">
                   Dashboard
+                </NavigationMenuLink>
+                <NavigationMenuLink href="/posts" className="rounded-xs">
+                  Posts
+                </NavigationMenuLink>
+                <NavigationMenuLink href="/posts/feed" className="rounded-xs">
+                  Feed
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>

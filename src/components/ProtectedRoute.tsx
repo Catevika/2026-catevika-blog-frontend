@@ -12,11 +12,9 @@ const ProtectedRoute = () => {
     if (isInitialized && !isAuthenticated) {
       const pathname = location.pathname;
 
-      // Correct protected routes based on your real App.tsx
       const isProtectedRoute =
-        pathname === "/posts" ||
         pathname === "/posts/new" ||
-        pathname === "/trash" ||
+        pathname === "/posts/trash" ||
         pathname.endsWith("/edit");
 
       if (isProtectedRoute) {
