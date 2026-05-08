@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { AuthStore, User } from "../types";
+import type { AuthStore } from "@/types";
 
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -10,15 +10,15 @@ export const useAuthStore = create<AuthStore>()(
       isInitialized: false,
       persistLogin: false,
 
-      setUser: (user: User | null) =>
+      setUser: (user) =>
         set({
           user,
           isAuthenticated: Boolean(user),
         }),
 
-      setInitialized: (value: boolean) => set({ isInitialized: value }),
+      setInitialized: (value) => set({ isInitialized: value }),
 
-      setPersistLogin: (value: boolean) => set({ persistLogin: value }),
+      setPersistLogin: (value) => set({ persistLogin: value }),
 
       logout: () => {
         set({
@@ -26,26 +26,31 @@ export const useAuthStore = create<AuthStore>()(
           isAuthenticated: false,
           persistLogin: false,
         });
-
-        // Clear persisted storage
         localStorage.removeItem("auth-persist");
       },
     }),
     {
       name: "auth-persist",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => {
-        if (state.persistLogin) {
-          return {
-            user: state.user,
-            isAuthenticated: state.isAuthenticated,
-            persistLogin: state.persistLogin,
-          };
+
+      // Always persist persistLogin, but only persist user if remember me was checked
+      partialize: (state) => ({
+        persistLogin: state.persistLogin,
+        user: state.persistLogin ? state.user : null,
+        isAuthenticated: state.persistLogin ? state.isAuthenticated : false,
+      }),
+
+      // Hydration logic
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+
+        // If remember me was NOT checked, ensure user is cleared
+        if (!state.persistLogin) {
+          state.setUser(null);
         }
 
-        return {
-          persistLogin: false,
-        };
+        // Mark hydration complete
+        state.setInitialized(true);
       },
     },
   ),
