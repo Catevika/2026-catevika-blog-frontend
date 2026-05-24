@@ -4,60 +4,60 @@ import { slugifyFinal, slugifyLive } from "@/utils/slugUtils";
 
 export const useSlugControl = ({
   postId,
-  post,
-  updatePost,
+  draft,
+  updateDraft,
 }: UseSlugControlProps) => {
   const isNew = postId === "new";
 
-  const [liveSlug, setLiveSlug] = useState(post?.slug ?? "");
-  const locked = post?.locked ?? true;
+  const [liveSlug, setLiveSlug] = useState(draft?.slug ?? "");
+  const locked = draft?.locked ?? true;
 
   const autoSlug = useMemo(
-    () => slugifyFinal(post?.title ?? ""),
-    [post?.title],
+    () => slugifyFinal(draft?.title ?? ""),
+    [draft?.title],
   );
 
   const handleTitleChange = useCallback(
     (value: string) => {
-      if (!post) return;
+      if (!draft) return;
 
       if (locked) {
         const newAuto = slugifyFinal(value);
-        updatePost(() => ({ title: value, slug: newAuto }));
+        updateDraft(() => ({ title: value, slug: newAuto }));
         setLiveSlug(newAuto);
       } else {
-        updatePost(() => ({ title: value }));
+        updateDraft(() => ({ title: value }));
       }
     },
-    [post, locked, updatePost],
+    [draft, locked, updateDraft],
   );
 
   const handleManualSlugChangeLive = useCallback(
     (rawSlug: string) => {
-      if (!post) return;
+      if (!draft) return;
 
       const live = slugifyLive(rawSlug);
-      updatePost(() => ({ slug: live, locked: false }));
+      updateDraft(() => ({ slug: live, locked: false }));
       setLiveSlug(live);
     },
-    [post, updatePost],
+    [draft, updateDraft],
   );
 
   const handleSlugChangeFinal = useCallback(
     (rawOrLiveSlug: string) => {
-      if (!post) return;
+      if (!draft) return;
 
-      const final = slugifyFinal(rawOrLiveSlug || post.title || "");
-      updatePost(() => ({ slug: final }));
+      const final = slugifyFinal(rawOrLiveSlug || draft.title || "");
+      updateDraft(() => ({ slug: final }));
       setLiveSlug(final);
     },
-    [post, updatePost],
+    [draft, updateDraft],
   );
 
   const toggleSlugLocked = useCallback(() => {
-    if (!post) return;
+    if (!draft) return;
 
-    updatePost((d: Post) => {
+    updateDraft((d: Post) => {
       const newLocked = !d.locked;
 
       if (newLocked) {
@@ -68,18 +68,18 @@ export const useSlugControl = ({
 
       return { locked: false };
     });
-  }, [post, updatePost]);
+  }, [draft, updateDraft]);
 
   const resetToAuto = useCallback(() => {
-    if (!post) return;
+    if (!draft) return;
 
-    const newAuto = slugifyFinal(post.title || "");
-    updatePost(() => ({ slug: newAuto, locked: true }));
+    const newAuto = slugifyFinal(draft.title || "");
+    updateDraft(() => ({ slug: newAuto, locked: true }));
     setLiveSlug(newAuto);
-  }, [post, updatePost]);
+  }, [draft, updateDraft]);
 
   return {
-    slug: post?.slug ?? autoSlug,
+    slug: draft?.slug ?? autoSlug,
     liveSlug,
     locked,
     isNew,

@@ -1,4 +1,8 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
+import type {
+  AnchorHTMLAttributes,
+  ButtonHTMLAttributes,
+  DragEventHandler,
+} from "react";
 import type { IconType } from "react-icons/lib";
 
 //------------------------------------------------------------
@@ -76,27 +80,47 @@ export interface PostFormValues {
   content: string;
   status: "draft" | "published";
   errors?: Record<string, string>;
+  authorId: string;
 }
 
 export interface UseSlugControlProps {
   postId: string;
-  post: Post | undefined;
-  updatePost: (post: (post: Post) => Partial<Post>) => void;
+  draft: Post | undefined;
+  updateDraft: (draft: (draft: Post) => Partial<Post>) => void;
 }
 
 export interface PostFormProps {
-  onSubmit: (values: PostFormValues) => void;
-  initialValues: PostFormValues;
-  isSaving: boolean;
-  saveError: string | null;
+  slug: string;
+  locked: boolean;
+  theme?: "light" | "dark";
+  draft?: Post | undefined;
+  originalTitle?: string;
+  originalContent?: string;
+  originalStatus?: "published" | "draft";
+  isNew: boolean;
+  isSaving?: boolean;
+  postId?: string;
+  saveError?: string;
   onTitleChange: (title: string) => void;
+  onStatusChange: (status: "draft" | "published") => void;
   onSlugInput: (slug: string) => void;
   onSlugChange: (slug: string) => void;
   onToggleLocked: () => void;
   onResetAuto: () => void;
+  onContentChange?: (content: string) => void;
+  onReset: () => void;
   onCancel: () => void;
-  slug: string;
-  locked: boolean;
+  onSubmit: (e: React.SyntheticEvent<HTMLFormElement, Event>) => Promise<void>;
+  backendSuggestion?: string | null;
+}
+
+export interface PostActionsProps {
+  hasUnsavedChanges: boolean;
+  pendingUploads: number;
+  isSaving: boolean;
+  onSave: () => void;
+  onReset: () => void;
+  onCancel: () => void;
 }
 
 //------------------------------------------------------------
@@ -186,6 +210,14 @@ export interface LikeMutationContext {
   previousPost?: Post;
 }
 
+export type PostCreateResponse =
+  | SerializedPost
+  | {
+      message: string;
+      suggestion?: string;
+      errors?: Record<string, string>;
+    };
+
 //------------------------------------------------------------
 // Pagination components
 //------------------------------------------------------------
@@ -237,3 +269,130 @@ export interface PostContentProps {
 }
 
 export type MarkdownLinkProps = AnchorHTMLAttributes<HTMLAnchorElement>;
+
+//------------------------------------------------------------
+// Pexels
+//------------------------------------------------------------
+
+export interface PexelsSearchState {
+  query: string;
+  setQuery: (q: string) => void;
+  page: number;
+  setPage: (p: number) => void;
+}
+
+export interface PexelsSrc {
+  original: string;
+  large?: string;
+  medium?: string;
+}
+
+export interface PexelsPhoto {
+  id: number;
+  url: string;
+  alt?: string;
+  photographer: string;
+  photographer_url: string;
+  src: PexelsSrc;
+}
+
+export interface PexelsResponse {
+  page: number;
+  per_page: number;
+  total_results?: number;
+  total_pages?: number;
+  photos: PexelsPhoto[];
+  next_page?: string;
+  prev_page?: string;
+}
+
+// ---------------------------------------------------------
+// Image uploader
+// ---------------------------------------------------------
+
+export interface UseImageUploadProps {
+  onSuccess?: (imageUrl: string, fileName: string) => void;
+  onError?: () => void;
+}
+
+export interface ImageUploadResponse {
+  success: boolean;
+  message?: string;
+  data?: {
+    url: string;
+    duplicate: boolean;
+    filename?: string;
+  };
+}
+
+export interface ImageUploaderProps {
+  onEnlarge?: (imageUrl: string, alt?: string) => void;
+  onInsert: (markdown: string) => void;
+  onDragEnter?: () => void;
+  onDragLeave?: () => void;
+  maxSizeMB?: number;
+  className?: string;
+}
+
+//------------------------------------------------------------
+// Pixel Sidebar
+//------------------------------------------------------------
+export interface PexelsSidebarProps {
+  onInsert?: (markdown: string) => void;
+}
+
+//------------------------------------------------------------
+// Pexels Photo Card
+//------------------------------------------------------------
+export interface PexelsPhotoCardProps {
+  photo: PexelsPhoto;
+  handleDragStart: (photo: PexelsPhoto) => DragEventHandler<HTMLDivElement>;
+  handleClickInsert: (photo: PexelsPhoto) => void;
+  handleOpenEnlarge: (photo: PexelsPhoto) => void;
+}
+
+//------------------------------------------------------------
+// Lightbox
+//------------------------------------------------------------
+export interface LightBoxProps {
+  enlargedPhoto: PexelsPhoto | null;
+  handleCloseEnlarge: () => void;
+}
+
+//------------------------------------------------------------
+// Slug control hook
+//------------------------------------------------------------
+export interface UseSlugControlProps {
+  postId: string;
+  draft: Post | undefined;
+  updateDraft: (draft: (draft: Post) => Partial<Post>) => void;
+}
+
+//------------------------------------------------------------
+// Slug availability hook
+//------------------------------------------------------------
+export interface SlugAvailability {
+  loading: boolean;
+  available: boolean | null;
+  suggestion: string | null;
+  error: string | null;
+}
+
+//------------------------------------------------------------
+// SlugField
+//------------------------------------------------------------
+export interface SlugFieldProps {
+  title: string;
+  slug: string;
+  locked: boolean;
+  disabled?: boolean;
+  error?: string | null;
+  postId?: string;
+  isNew: boolean;
+
+  onSlugInput: (value: string) => void;
+  onSlugChange: (value: string) => void;
+  onToggleLocked: () => void;
+  onResetAuto: () => void;
+  backendSuggestion?: string | null;
+}

@@ -37,63 +37,34 @@
   }
 
   --background: oklch(1 0 0);
-
   --foreground: oklch(0.141 0.005 285.823);
-
   --card: oklch(1 0 0);
-
   --card-foreground: oklch(0.141 0.005 285.823);
-
   --popover: oklch(1 0 0);
-
   --popover-foreground: oklch(0.141 0.005 285.823);
-
   --primary: oklch(0.5 0.134 242.749);
-
   --primary-foreground: oklch(0.977 0.013 236.62);
-
   --secondary: oklch(0.967 0.001 286.375);
-
   --secondary-foreground: oklch(0.21 0.006 285.885);
-
   --muted: oklch(0.967 0.001 286.375);
-
   --muted-foreground: oklch(0.552 0.016 285.938);
-
   --accent-foreground: oklch(0.21 0.006 285.885);
-
   --destructive: oklch(0.577 0.245 27.325);
-
   --input: oklch(0.92 0.004 286.32);
-
   --ring: oklch(0.705 0.015 286.067);
-
   --chart-1: oklch(0.828 0.111 230.318);
-
   --chart-2: oklch(0.685 0.169 237.323);
-
   --chart-3: oklch(0.588 0.158 241.966);
-
   --chart-4: oklch(0.5 0.134 242.749);
-
   --chart-5: oklch(0.443 0.11 240.79);
-
   --radius: 0.625rem;
-
   --sidebar: oklch(0.985 0 0);
-
   --sidebar-foreground: oklch(0.141 0.005 285.823);
-
   --sidebar-primary: oklch(0.588 0.158 241.966);
-
   --sidebar-primary-foreground: oklch(0.977 0.013 236.62);
-
   --sidebar-accent: oklch(0.967 0.001 286.375);
-
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-
   --sidebar-border: oklch(0.92 0.004 286.32);
-
   --sidebar-ring: oklch(0.705 0.015 286.067)
 }
 
@@ -116,12 +87,6 @@
     filter: invert(1) brightness(2);
   }
 }
-
-body::-webkit-scrollbar {
-    display: none;
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
 
 #root {
   width: 1024px;
@@ -160,7 +125,6 @@ code {
   font-size: 15px;
   line-height: 135%;
   padding: 4px 8px;
-  background: var(--code-bg);
 }
 
 @theme inline {
@@ -241,9 +205,14 @@ code {
 }
 
 @layer base {
+  html {
+    @apply font-sans overflow-x-hidden overflow-y-scroll scroll-smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
 
+    /* Remove the browser password eye */
     /* Chrome, Edge, Opera */
     input[type="password"]::-ms-reveal,
     input[type="password"]::-ms-clear {
@@ -267,6 +236,7 @@ code {
       display: none;
     }
 
+    /* Hide scrollbar for Chrome, Safari and Opera */
     & ::-webkit-scrollbar {
     display: none;
     -ms-overflow-style: none; /* IE and Edge */
@@ -274,8 +244,9 @@ code {
     }
   }
 
-  html {
-    @apply font-sans overflow-x-hidden overflow-y-scroll scroll-smooth;
+  /* Remove the scrollbar shift for the Select component from Schadcn */
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
   }
 
   /* replace the editor text color for code - light mode */
@@ -285,13 +256,203 @@ code {
 
   #post-content{
     /* replace the editor background */
-    & .wmde-markdown-color {
-      background-color: transparent !important;
+    & .wmde-markdown-color p {
+      @apply bg-transparent dark:bg-card dark:text-foreground;
     }
 
     /* center image and caption */
     & div > img + p {
       @apply flex justify-center items-center w-full gap-2;
     }
+  }
+
+  #post-create-edit {
+    @apply flex flex-col;
+
+    .post-create-edit-main-title {
+      @apply flex flex-col justify-center  md:flex-row md:flex-nowrap md:justify-between;
+    }
+
+    .post-create-edit-container {
+      @apply flex h-full flex-col rounded border lg:h-[calc(100vh-145px)] lg:flex-row;
+    }
+
+    .post-create-edit-actions {
+      @apply flex items-center justify-center gap-2 pb-4 md:justify-end md:pb-0;
+    }
+
+    .post-create-edit-title-status {
+      @apply flex flex-col gap-2 md:flex-row md:items-end md:justify-between;
+    }
+
+    .post-create-edit-title-group {
+      @apply order-2 flex w-full flex-col gap-2 md:order-1;
+    }
+
+    .post-create-edit-title-input {
+      @apply border-primary w-full rounded border px-3 py-2 text-lg font-semibold;
+    }
+
+    .post-create-edit-status-group {
+      @apply order-1 md:order-2 flex flex-wrap gap-1 w-42;
+    }
+
+    .post-create-edit-status {
+      @apply py-4 md:py-0 w-md;
+    }
+
+    .mdEditor-form {
+      @apply flex min-w-0 flex-1 flex-col gap-4 md:p-2;
+    }
+
+    .mdEditor-container {
+      @apply relative flex-1 overflow-x-hidden overflow-y-auto rounded border p-0;
+    }
+
+    /* Target the CodeMirror editor */
+    .w-md-editor-text-pre > code,
+    .w-md-editor-text-input {
+      @apply flex flex-col text-sm!;
+    }
+
+    /* Also update the preview to match */
+    .w-md-editor-preview .wmde-markdown p,
+    .w-md-editor-preview .wmde-markdown li,
+    .w-md-editor-preview .wmde-markdown code,
+    .w-md-editor-preview .wmde-markdown pre {
+      @apply min-w-0 text-sm!;
+    }
+
+    .w-md-editor-toolbar {
+      @apply sticky top-0 z-20 md:flex! md:justify-between!;
+    }
+
+    .w-md-editor-content {
+      @apply h-full! flex-1 overflow-y-auto p-2;
+    }
+
+    /* First ul - spread evenly on mobile, normal flex on md+ */
+    .w-md-editor-toolbar > ul:first-child {
+      @apply flex! w-full! flex-wrap! justify-evenly! md:w-auto!;
+    }
+
+    /* Ensure list items don't shrink */
+    .w-md-editor-toolbar > ul:first-child > li {
+      @apply shrink-0!;
+    }
+
+    /* Second toolbar (edit/live/preview) - keep flex */
+    .w-md-editor-toolbar > ul:last-child {
+      @apply flex! gap-2!;
+    }
+  }
+
+  #pexels-sidebar {
+    @apply flex flex-col p-1 lg:h-full lg:w-74 lg:border-r;
+    & .pexels-sidebar-input {
+      @apply flex-1 rounded border text-base md:text-lg;
+    }
+
+    .pexels-results {
+      @apply flex flex-1 flex-row gap-1 overflow-x-auto lg:flex-col lg:overflow-y-auto;
+    }
+
+    .pexels-results-list {
+      @apply m-0 flex min-w-max list-none flex-row flex-nowrap gap-1 p-0 lg:min-w-0 lg:flex-col lg:flex-wrap;
+    }
+
+    .photo-card {
+      @apply shrink-0 overflow-hidden rounded-md border lg:flex-1 lg:cursor-grab text-sm;
+    }
+  
+    .photo-card-image {
+      @apply relative aspect-video min-h-40 w-full overflow-hidden;
+      & img {
+        @apply absolute inset-0 h-full w-full object-cover;
+      }
+    }
+
+    .lightbox {
+      @apply bg-secondary/90 fixed inset-0 z-200 flex items-center justify-center overscroll-contain;
+
+      & .lightbox-card {
+        @apply relative max-h-[80vh] max-w-[80vw];
+      }
+
+      & .lightbox-image {
+        @apply max-h-[80vh] max-w-[80vw] object-contain rounded-md;
+      }
+
+      & .lightbox-author {
+        @apply mt-4 text-center;
+      }
+    }
+  }
+
+  #post-form {
+    @apply flex flex-1 flex-col gap-2 p-2;
+
+    & textarea {
+      @apply h-full! min-h-50 flex-1;
+    }
+
+    & .mdEditor-container {
+      @apply relative flex-1 overflow-x-hidden overflow-y-scroll rounded border p-0;
+    }
+
+    & .w-md-editor-text-pre, 
+    .w-md-editor-text-pre .code-highlight {
+      background-color: transparent !important;
+    }
+  }
+
+  .form-error {
+    @apply text-destructive rounded-md p-2 text-lg;
+  }
+}
+
+@layer utilities {
+  /* Custom hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .w-md-editor-area,
+  .w-md-editor-input,
+  .w-md-editor-preview,
+  .wmde-markdown {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+
+    &::-webkit-scrollbar {
+      @apply hidden;
+    }
+  }
+
+  body.modal-open {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Hide visually but from screen readers */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 }
