@@ -43,7 +43,7 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <Card className="w-full mx-auto mt-10 max-w-1/3">
+    <Card className="w-full mx-auto mt-10 max-w-2/3 md:max-w-1/3">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center">
           {mode === "signup" ? "Create an account" : "Login"}

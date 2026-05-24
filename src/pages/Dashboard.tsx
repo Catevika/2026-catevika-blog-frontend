@@ -14,7 +14,7 @@ export default function Dashboard() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
-    <section className="relative w-auto h-auto max-w-5xl mx-auto max-h-150 grow">
+    <section className="relative w-auto h-auto max-w-2xl mx-auto max-h-120 grow">
       <figure className="flex flex-col items-center justify-center">
         <img
           src="assets/windows-11-bloom-light-variants-v1.png"

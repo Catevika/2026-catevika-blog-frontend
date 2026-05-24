@@ -9,7 +9,7 @@ const MarkdownImage = ({ src, alt, ...props }: ComponentProps<"img">) => {
     <img
       src={src}
       alt={alt ?? ""}
-      className="my-6 h-auto max-h-96 max-w-full rounded-md object-cover md:max-h-125"
+      className="my-2 h-auto max-h-96 max-w-full rounded-md object-cover md:max-h-125"
       style={{
         display: "block",
         marginLeft: "auto",

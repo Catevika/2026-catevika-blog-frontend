@@ -104,7 +104,7 @@ export async function createPost(input: Partial<Post>): Promise<Post> {
     throw new Error(message);
   }
 
-  return (await res.json()) as Post;
+  return (await res.json()) as Promise<Post>;
 }
 
 // Update post (authenticated & author only)

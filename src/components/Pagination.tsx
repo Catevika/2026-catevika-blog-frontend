@@ -1,6 +1,6 @@
-import CustomButton from "@/components/CustomButton";
 import type { PaginationProps } from "@/types";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { Button } from "@/components/ui/button";
 
 export function Pagination({
   handlePrevPage,
@@ -46,28 +46,30 @@ export function Pagination({
       : "";
 
   return (
-    <nav className="w-65 flex-col px-2" aria-label="Photo pagination">
-      <span className="flex items-center justify-center gap-4">
-        <CustomButton
+    <nav className="flex flex-col text-sm" aria-label="Photo pagination">
+      <span className="flex items-center justify-center">
+        <Button
           type="button"
           onClick={handlePrevPage}
           disabled={isFirstPage}
-          icon={FiChevronLeft}
           aria-label="Go to previous page"
-        />
-        <span className="text-lg" aria-live="polite" aria-atomic="true">
+        >
+          <FiChevronLeft />
+        </Button>
+        <span className="px-2" aria-live="polite" aria-atomic="true">
           Page {page} of {effectiveMaxPages}
         </span>
 
-        <CustomButton
+        <Button
           type="button"
           onClick={handleNextPage}
           disabled={isLastPage}
-          icon={FiChevronRight}
           aria-label="Go to next page"
-        />
+        >
+          <FiChevronRight />
+        </Button>
       </span>
-      <span className="text-primary/70 flex items-center justify-center gap-4 pt-1">
+      <span className="text-xs text-muted-foreground flex items-center justify-center gap-4 pt-1">
         <em>{maxInfo}</em>
       </span>
     </nav>

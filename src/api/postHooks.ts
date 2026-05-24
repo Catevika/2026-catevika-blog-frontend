@@ -108,7 +108,7 @@ export const useInProgressPostsQuery = (
 
   return useQuery<PaginatedPost, Error>({
     queryKey: ["inProgressPosts", { page, limit, search, author }],
-    enabled: Boolean(author),
+    enabled: true,
     queryFn: async () => {
       const data = await getPosts({
         page,
@@ -116,8 +116,9 @@ export const useInProgressPostsQuery = (
         search,
         status: "draft",
         deleted: "false",
-        author,
+        ...(author ? { author } : {}),
       });
+
       assertPaginatedPost(data);
 
       if (data.pagination.hasNextPage) {
@@ -133,14 +134,14 @@ export const useInProgressPostsQuery = (
               search,
               status: "draft",
               deleted: "false",
-              author,
+              ...(author ? { author } : {}),
             }),
         });
       }
 
       return data;
     },
-    placeholderData: (prev) => prev,
+    placeholderData: undefined, // prevents showing stale Published posts
   });
 };
 
