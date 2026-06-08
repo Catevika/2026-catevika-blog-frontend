@@ -1,7 +1,6 @@
-// src/utils/createEmptyDraft.ts
-import type { Post } from "@/types";
+import type { SerializedPost } from "@/types";
 
-export const createEmptyDraft = (authorId?: string): Post => ({
+export const createEmptyDraft = (userId?: string): SerializedPost => ({
   id: "",
   title: "",
   slug: "",
@@ -9,9 +8,8 @@ export const createEmptyDraft = (authorId?: string): Post => ({
   content: "",
   status: "draft",
   deleted: false,
-  authorId: authorId ?? "",
   author: {
-    id: authorId ?? "",
+    id: userId ?? "",
     name: "",
     email: "",
   },

@@ -1,13 +1,17 @@
 import type { SerializedPost } from "@/types";
 import { formatDate } from "@/utils/formatDate";
+import { Link } from "react-router";
 
 const AuthorForPost = ({ post }: { post: SerializedPost }) => {
   return (
-    <div id="author" className="flex-col-2 mb-4 items-center text-sm">
-      <h1>{post.title}</h1>
+    <div id="author" className="flex-col my-4 text-sm">
+      <Link to={`/posts/${post.id}`} className="font-bold hover:underline">
+        {post.title}
+      </Link>
       <p>
-        by <span className="font-bold">{post.author?.name}</span> - Last update:{" "}
-        <span className="font-bold">
+        by <span className="font-semibold">{post.author?.name}</span> - Last
+        update:{" "}
+        <span className="font-semibold">
           {formatDate(post.updatedAt)
             ? formatDate(post.updatedAt)
             : formatDate(post.createdAt)}

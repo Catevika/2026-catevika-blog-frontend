@@ -1,9 +1,10 @@
+import { ApiError } from "@/errors/ApiError";
 import type {
-  GetPostsParams,
-  Post,
-  PostsResponse,
-  LikePostResponse,
   GetPostsFilters,
+  GetPostsParams,
+  LikePostResponse,
+  PostsResponse,
+  SerializedPost,
 } from "@/types/index.js";
 
 // Generic getPosts helper that calls /api/posts with arbitrary filters.
@@ -75,17 +76,19 @@ export const getFeedPosts = async (
 export const getPost = async (
   postId: string,
   userId?: string,
-): Promise<Post> => {
+): Promise<SerializedPost> => {
   const qs = userId ? `?userId=${encodeURIComponent(userId)}` : "";
   const url = `/api/posts/${encodeURIComponent(postId)}${qs}`;
 
   const response = await fetch(url, { credentials: "include" });
   if (!response.ok) throw new Error("Post not found");
-  return (await response.json()) as Post;
+  return (await response.json()) as SerializedPost;
 };
 
 // Create post (authenticated only)
-export async function createPost(input: Partial<Post>): Promise<Post> {
+export async function createPost(
+  input: Partial<SerializedPost>,
+): Promise<SerializedPost> {
   const res = await fetch("/api/posts/new", {
     method: "POST",
     credentials: "include",
@@ -104,13 +107,13 @@ export async function createPost(input: Partial<Post>): Promise<Post> {
     throw new Error(message);
   }
 
-  return (await res.json()) as Promise<Post>;
+  return (await res.json()) as Promise<SerializedPost>;
 }
 
 // Update post (authenticated & author only)
 export async function updatePost(
-  postData: { id: string } & Partial<Post>,
-): Promise<Post> {
+  postData: { id: string } & Partial<SerializedPost>,
+): Promise<SerializedPost> {
   const { id, ...data } = postData;
 
   const res = await fetch(`/api/posts/${encodeURIComponent(id)}`, {
@@ -118,19 +121,36 @@ export async function updatePost(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
     credentials: "include",
+    body: JSON.stringify(data),
   });
 
   if (!res.ok) {
-    throw new Error("Failed to update post. Please try again.");
+    let message = "Failed to update post";
+    try {
+      const json = (await res.json()) as {
+        message?: string;
+        suggestion?: string;
+        errors?: Record<string, string>;
+      };
+      if (json?.message) message = json.message;
+
+      // Support backend slug conflict suggestion
+      if (res.status === 409) {
+        throw new ApiError(message, 409, json);
+      }
+    } catch {
+      // ignore JSON parse errors
+    }
+
+    throw new Error(message);
   }
 
-  return (await res.json()) as Post;
+  return (await res.json()) as SerializedPost;
 }
 
 // Soft delete - set deleted: true
-export async function softDeletePost(id: string): Promise<Post> {
+export async function softDeletePost(id: string): Promise<SerializedPost> {
   const res = await fetch(`/api/posts/${encodeURIComponent(id)}`, {
     method: "PUT",
     headers: {
@@ -144,7 +164,7 @@ export async function softDeletePost(id: string): Promise<Post> {
     throw new Error("Failed to move post to trash. Please try again.");
   }
 
-  return (await res.json()) as Post;
+  return (await res.json()) as SerializedPost;
 }
 
 // Fetch trashed posts
@@ -169,7 +189,7 @@ export async function fetchTrashedPosts(
 }
 
 // Restore post
-export async function restorePost(id: string): Promise<Post> {
+export async function restorePost(id: string): Promise<SerializedPost> {
   const res = await fetch(`/api/posts/${encodeURIComponent(id)}/restore`, {
     method: "POST",
     credentials: "include",
@@ -179,7 +199,7 @@ export async function restorePost(id: string): Promise<Post> {
     throw new Error("Failed to restore post. Please try again.");
   }
 
-  return (await res.json()) as Post;
+  return (await res.json()) as SerializedPost;
 }
 
 // Like post
@@ -204,12 +224,18 @@ export const likePost = async (
 };
 
 // Fetch favorite posts
-export const fetchFavoritesPosts = async (): Promise<{ topPosts: Post[] }> => {
+export const fetchFavoritesPosts = async (): Promise<{
+  docs: SerializedPost[];
+}> => {
   const response = await fetch("/api/posts/favorites", {
     credentials: "include",
   });
+
   if (!response.ok) {
     throw new Error("Failed to fetch favorite posts");
   }
-  return (await response.json()) as { topPosts: Post[] };
+
+  const json = (await response.json()) as { docs: SerializedPost[] };
+
+  return { docs: json.docs };
 };

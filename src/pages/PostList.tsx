@@ -1,32 +1,32 @@
 import {
-  usePublishedPostsQuery,
   useInProgressPostsQuery,
-  useTrashedPostsQuery,
+  usePublishedPostsQuery,
   useRestorePostMutation,
+  useTrashedPostsQuery,
 } from "@/api/postHooks";
 import AuthorForList from "@/components/AuthorForList";
 import CustomFeedButton from "@/components/CustomFeedButton";
 import CustomNewButton from "@/components/CustomNewButton";
 import CustomTrendingButton from "@/components/CustomTrendingButton";
+import PostListItemEdit from "@/components/PostListItemEdit";
 import PostsPagination from "@/components/PostsPagination";
 import TypographyH1 from "@/components/TypographyH1";
 import { Badge } from "@/components/ui/badge";
-import { useQueryClient } from "@tanstack/react-query";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FiSearch } from "react-icons/fi";
-import { Link, useNavigate, useSearchParams } from "react-router";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useScrollRestoration } from "@/hooks/useScrollRestoration";
-import type { PaginatedPost, PostsResponse, SerializedPost } from "@/types";
+import { Button } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Button } from "@/components/ui/button";
-import { LiaTrashRestoreAltSolid } from "react-icons/lia";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import { useAuthStore } from "@/stores/authStore";
-import PostListItemEdit from "@/components/PostListItemEdit";
+import type { PaginatedPost, PostsResponse, SerializedPost } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { FiSearch } from "react-icons/fi";
+import { LiaTrashRestoreAltSolid } from "react-icons/lia";
+import { Link, useNavigate, useSearchParams } from "react-router";
 
 // Type guard: PostsResponse may be PaginatedPost or { error: string }
 function isPaginatedPost(
@@ -253,7 +253,7 @@ export default function PostList() {
         <>
           <Badge className="px-3 mt-4 text-base h-7">In Progress</Badge>
 
-          {inProgressPagination && inProgressPagination.totalPages > 1 && (
+          {inProgressPagination && inProgressPagination.totalPages > 1 ? (
             <PostsPagination
               page={inProgressPagination.page}
               limit={inProgressPagination.limit}
@@ -264,6 +264,8 @@ export default function PostList() {
               }
               onNextPage={() => goTo(page, inProgressPage + 1, deletedPage)}
             />
+          ) : (
+            <div className="my-2" />
           )}
 
           <ul>
@@ -303,10 +305,7 @@ export default function PostList() {
           <ul className="mt-4">
             {trashedPosts.length > 0 ? (
               trashedPosts.map((post: SerializedPost) => (
-                <li
-                  key={post.id}
-                  className="flex items-center justify-between gap-4"
-                >
+                <li key={post.id} className="flex items-center justify-between">
                   <Link
                     to={`/posts/${post.id}`}
                     aria-label={`Read ${post.title}`}

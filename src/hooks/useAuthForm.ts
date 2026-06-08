@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
 import { fetchMe, loginRequest, signupRequest } from "@/api/authApi";
+import { RateLimitError } from "@/errors/RateLimitError";
 import { useAuthStore } from "@/stores/authStore";
 import {
   loginPayloadSchema,
@@ -8,7 +7,8 @@ import {
   type LoginPayload,
   type SignupPayload,
 } from "@/types/auth";
-import { RateLimitError } from "@/errors/RateLimitError";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useMe(enabled: boolean) {
   return useQuery({
@@ -33,8 +33,13 @@ export function useAuthForm() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  // backend-driven cooldown (Retry-After)
+  // Cooldown state + ref to avoid stale closures
   const [cooldown, setCooldown] = useState<number | null>(null);
+  const cooldownRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    cooldownRef.current = cooldown;
+  }, [cooldown]);
 
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -45,7 +50,7 @@ export function useAuthForm() {
   const loginMutation = useMutation({ mutationFn: loginRequest });
   const signupMutation = useMutation({ mutationFn: signupRequest });
 
-  // countdown timer
+  // Cooldown countdown
   useEffect(() => {
     if (cooldown === null) return;
 
@@ -70,27 +75,27 @@ export function useAuthForm() {
   const toggleMode = () => {
     setMode((prev) => (prev === "login" ? "signup" : "login"));
 
-    setValues({
-      name: "",
-      email: "",
-      password: "",
-    });
-
+    setValues({ name: "", email: "", password: "" });
     setFieldErrors({});
     setGlobalError(null);
     setRememberMe(false);
 
-    // reset cooldown when switching modes
     setCooldown(null);
+    cooldownRef.current = null;
+
+    loginMutation.reset();
+    signupMutation.reset();
   };
+
   const handleSubmit = useCallback(
     async (e: React.SyntheticEvent) => {
       e.preventDefault();
+
+      // Correct cooldown guard (no stale state)
+      if (cooldownRef.current !== null) return false;
+
       setFieldErrors({});
       setGlobalError(null);
-
-      // prevent submitting during cooldown
-      if (cooldown !== null) return false;
 
       const signupData: SignupPayload = {
         name: values.name,
@@ -126,7 +131,13 @@ export function useAuthForm() {
           const result = await signupMutation.mutateAsync(signupData);
           setUser(result.user);
           setInitialized(true);
+
           setCooldown(null);
+          cooldownRef.current = null;
+
+          signupMutation.reset();
+          loginMutation.reset();
+
           return true;
         }
 
@@ -134,14 +145,24 @@ export function useAuthForm() {
         setUser(result.user);
         setPersistLogin(rememberMe);
         setInitialized(true);
+
         setCooldown(null);
+        cooldownRef.current = null;
+
+        loginMutation.reset();
+        signupMutation.reset();
+
         return true;
       } catch (err) {
         if (err instanceof RateLimitError) {
           setCooldown(err.retryAfter ?? null);
+          cooldownRef.current = err.retryAfter ?? null;
           setGlobalError(err.message);
           return false;
         }
+
+        setCooldown(null);
+        cooldownRef.current = null;
 
         const message =
           err instanceof Error ? err.message : "Authentication failed";
@@ -159,7 +180,6 @@ export function useAuthForm() {
       setUser,
       setPersistLogin,
       setInitialized,
-      cooldown,
     ],
   );
 

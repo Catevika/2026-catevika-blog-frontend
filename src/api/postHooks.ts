@@ -1,27 +1,25 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuthStore } from "@/stores/authStore";
-import type {
-  GetPostsParams,
-  Post,
-  PaginatedPost,
-  PostsResponse,
-  LikePostResponse,
-  LikeMutationContext,
-} from "@/types/index.js";
 import {
   createPost,
   fetchFavoritesPosts,
-  getPost,
-  getPublishedPosts,
-  getPosts,
+  fetchTrashedPosts,
   getFeedPosts,
+  getPost,
+  getPosts,
+  getPublishedPosts,
   likePost,
   restorePost,
   softDeletePost,
   updatePost,
-  fetchTrashedPosts,
 } from "@/api/postApi.js";
-
+import { useAuthStore } from "@/stores/authStore";
+import type {
+  GetPostsParams,
+  LikePostResponse,
+  PaginatedPost,
+  PostsResponse,
+  SerializedPost,
+} from "@/types/index.js";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 // Type guard: narrow PostsResponse -> PaginatedPost
 function assertPaginatedPost(
   value: PostsResponse,
@@ -172,7 +170,7 @@ export const useTrashedPostsQuery = ({
 export const useCreatePostMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Post, Error, Partial<Post>>({
+  return useMutation<SerializedPost, Error, Partial<SerializedPost>>({
     mutationFn: createPost,
     onSuccess: async (created) => {
       if (created.status === "published") {
@@ -189,7 +187,11 @@ export const useCreatePostMutation = () => {
 export const useUpdatePostMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Post, Error, { id: string } & Partial<Post>>({
+  return useMutation<
+    SerializedPost,
+    Error,
+    { id: string } & Partial<SerializedPost>
+  >({
     mutationFn: updatePost,
     onSuccess: async (updatedPost) => {
       queryClient.setQueriesData(
@@ -207,7 +209,7 @@ export const useUpdatePostMutation = () => {
 export const useSoftDeletePostMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Post, Error, string>({
+  return useMutation<SerializedPost, Error, string>({
     mutationFn: softDeletePost,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
@@ -220,7 +222,7 @@ export const useSoftDeletePostMutation = () => {
 export const useRestorePostMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Post, Error, string>({
+  return useMutation<SerializedPost, Error, string>({
     mutationFn: restorePost,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
@@ -232,32 +234,35 @@ export const useRestorePostMutation = () => {
 
 export const useLikePostMutation = () => {
   const queryClient = useQueryClient();
-  const userId = useAuthStore((state) => state.user?.id);
+  const userId = useAuthStore((s) => s.user?.id);
 
   return useMutation<
     LikePostResponse,
     Error,
     { postId: string },
-    LikeMutationContext
+    { previousPost?: SerializedPost }
   >({
-    mutationFn: ({ postId }: { postId: string }) => {
+    mutationFn: async ({ postId }) => {
       if (!userId) throw new Error("Must be logged in to like");
       return likePost(postId, userId);
     },
 
     onMutate: async ({ postId }) => {
+      if (!userId) return {};
+
       await queryClient.cancelQueries({ queryKey: ["post", postId, userId] });
 
-      const previousPost = queryClient.getQueryData<Post>([
+      const previousPost = queryClient.getQueryData<SerializedPost>([
         "post",
         postId,
         userId,
       ]);
 
-      queryClient.setQueryData<Post | undefined>(
+      // Optimistic update for the post detail
+      queryClient.setQueryData<SerializedPost>(
         ["post", postId, userId],
         (old) => {
-          if (!old || !userId) return old;
+          if (!old) return old;
 
           const isLiked = old.likedBy.includes(userId);
 
@@ -272,42 +277,68 @@ export const useLikePostMutation = () => {
         },
       );
 
-      // Return the typed context so onError receives it
+      // Optimistic update for all post lists
+      const updateList = (key: readonly unknown[]) => {
+        queryClient.setQueryData<{
+          docs: SerializedPost[];
+          pagination: PaginatedPost;
+        }>(key, (old) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            docs: old.docs.map((p) =>
+              p.id === postId
+                ? {
+                    ...p,
+                    liked: !p.liked,
+                    likeCount: p.liked ? p.likeCount - 1 : p.likeCount + 1,
+                    likedBy: p.liked
+                      ? p.likedBy.filter((id) => id !== userId)
+                      : [...p.likedBy, userId],
+                  }
+                : p,
+            ),
+          };
+        });
+      };
+
+      updateList(["posts"]);
+      updateList(["publishedPosts"]);
+
       return { previousPost };
     },
 
-    onError: (error, variables, context) => {
-      console.error("Like failed:", error);
-      if (context?.previousPost) {
-        queryClient.setQueryData(
-          ["post", variables.postId, userId],
-          context.previousPost,
-        );
+    onError: (_err, { postId }, ctx) => {
+      if (ctx?.previousPost) {
+        queryClient.setQueryData(["post", postId, userId], ctx.previousPost);
       }
     },
 
-    onSuccess: async (data, variables) => {
-      queryClient.setQueryData<Post | undefined>(
-        ["post", variables.postId, userId],
+    onSuccess: (data, { postId }) => {
+      // Reconcile with server
+      queryClient.setQueryData<SerializedPost>(
+        ["post", postId, userId],
         (old) =>
           old
             ? {
                 ...old,
                 liked: data.liked,
-                likedBy: data.likedBy,
                 likeCount: data.likeCount,
+                likedBy: data.likedBy,
               }
             : old,
       );
 
-      await queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
-      await queryClient.invalidateQueries({ queryKey: ["posts"] });
+      // Keep lists fresh
+      void queryClient.invalidateQueries({ queryKey: ["posts"] });
+      void queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
     },
   });
 };
 
 export const useFavoritesPosts = () => {
-  return useQuery<{ topPosts: Post[] }, Error>({
+  return useQuery<{ docs: SerializedPost[] }, Error>({
     queryKey: ["favorites-posts"],
     queryFn: fetchFavoritesPosts,
     staleTime: 2 * 60 * 1000,
@@ -315,7 +346,7 @@ export const useFavoritesPosts = () => {
 };
 
 export const useSinglePostQuery = (postId: string, userId?: string) => {
-  return useQuery<Post, Error>({
+  return useQuery<SerializedPost | undefined, Error>({
     queryKey: ["post", postId, userId],
     queryFn: () => getPost(postId, userId),
     enabled: !!postId,

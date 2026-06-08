@@ -35,11 +35,20 @@ export default function NavBar() {
                 <NavigationMenuLink href="/" className="rounded-xs">
                   Dashboard
                 </NavigationMenuLink>
+                <NavigationMenuLink href="/posts/feed" className="rounded-xs">
+                  Feed
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  href="/posts/favorites"
+                  className="rounded-xs"
+                >
+                  Trending
+                </NavigationMenuLink>
                 <NavigationMenuLink href="/posts" className="rounded-xs">
                   Posts
                 </NavigationMenuLink>
-                <NavigationMenuLink href="/posts/feed" className="rounded-xs">
-                  Feed
+                <NavigationMenuLink href="/posts/new" className="rounded-xs">
+                  New post
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>

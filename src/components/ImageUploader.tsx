@@ -1,10 +1,10 @@
-import { TbPhoto } from "react-icons/tb";
+import { uploaderApi } from "@/api/uploaderApi";
+import { Button } from "@/components/ui/button";
+import type { ImageUploaderProps } from "@/types";
 import type React from "react";
 import type { ChangeEvent, DragEvent } from "react";
 import { useCallback, useRef, useState } from "react";
-import { uploaderApi } from "@/api/uploaderApi";
-import type { ImageUploaderProps } from "@/types";
-import { Button } from "@/components/ui/button";
+import { TbPhoto } from "react-icons/tb";
 
 // Unique placeholder ID (kept for drag placeholder generation)
 function makePlaceholderId() {

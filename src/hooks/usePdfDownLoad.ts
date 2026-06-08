@@ -26,36 +26,22 @@ export const usePdfDownload = () => {
         body: JSON.stringify({ postId, title }),
       });
 
-      // Handle auth-specific statuses first
-      if (response.status === 401) {
-        throw new Error("You must be logged in to export this post");
-      }
-      if (response.status === 403) {
-        throw new Error("You are not authorized to export this post");
-      }
-
       if (!response.ok) {
         let errorMessage = "Failed to generate PDF";
 
         try {
-          // Define the expected error shape
           const errorData: unknown = await response.json();
+          console.error("🚨 PDF Generation Error:", errorData);
 
-          // Narrow the type safely
-          if (
-            typeof errorData === "object" &&
-            errorData !== null &&
-            ("message" in errorData || "error" in errorData)
-          ) {
-            const typed = errorData as { message?: string; error?: string };
-            console.error("🚨 PDF Generation Error:", typed);
-            errorMessage = typed.message ?? typed.error ?? errorMessage;
+          if (typeof errorData === "object" && errorData !== null) {
+            const ed = errorData as { message?: string; error?: string };
+            errorMessage = ed.message ?? ed.error ?? errorMessage;
           } else {
-            // JSON exists but doesn't match expected shape
-            errorMessage = `${errorMessage} (Unexpected error format)`;
+            // If response JSON isn't an object, include status info
+            errorMessage = `${errorMessage} (${response.status}: ${response.statusText})`;
           }
         } catch {
-          // JSON parsing failed entirely
+          // If response is not JSON or parsing failed, use status text
           errorMessage = `${errorMessage} (${response.status}: ${response.statusText})`;
         }
 
@@ -64,6 +50,7 @@ export const usePdfDownload = () => {
 
       const blob = await response.blob();
 
+      // Verify blob is not empty
       if (blob.size === 0) {
         throw new Error("Generated PDF is empty");
       }
@@ -74,6 +61,7 @@ export const usePdfDownload = () => {
       const a = document.createElement("a");
       a.href = url;
 
+      // Sanitize filename: remove special characters, limit length
       const sanitizedTitle = title
         .replace(/[^a-z0-9\s-]/gi, "_")
         .replace(/\s+/g, "_")
@@ -81,8 +69,11 @@ export const usePdfDownload = () => {
 
       a.download = `${sanitizedTitle}.pdf`;
 
+      // Trigger download
       document.body.appendChild(a);
       a.click();
+
+      // Cleanup
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
@@ -96,6 +87,9 @@ export const usePdfDownload = () => {
           : "An unexpected error occurred while generating the PDF";
 
       setPdfError(errorMessage);
+
+      // Optional: You could also throw here if you want to handle it elsewhere
+      // throw error;
     } finally {
       setIsGeneratingPdf(false);
     }

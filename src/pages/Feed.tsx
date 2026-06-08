@@ -1,27 +1,27 @@
 import { useFeedPostsQuery } from "@/api/postHooks";
-import CustomPublishedButton from "@/components/CustomPublishedButton";
+import AuthorForPost from "@/components/AuthorForPost";
 import CustomNewButton from "@/components/CustomNewButton";
+import CustomPdfButton from "@/components/CustomPdfButton";
+import CustomPublishedButton from "@/components/CustomPublishedButton";
 import CustomTrendingButton from "@/components/CustomTrendingButton";
+import LikeButton from "@/components/LikeButton";
+import PostContent from "@/components/PostContent";
 import PostsPagination from "@/components/PostsPagination";
-import { useAuthStore } from "@/stores/authStore";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FiSearch } from "react-icons/fi";
-import { useNavigate, useSearchParams } from "react-router";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useScrollRestoration } from "@/hooks/useScrollRestoration";
-import type { PaginatedPost, PostsResponse, SerializedPost } from "@/types";
+import TypographyH1 from "@/components/TypographyH1";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import LikeButton from "@/components/LikeButton";
-import CustomPdfButton from "@/components/CustomPdfButton";
-import AuthorForPost from "@/components/AuthorForPost";
-import PostContent from "@/components/PostContent";
-import TypographyH1 from "@/components/TypographyH1";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useScrollRestoration } from "@/hooks/useScrollRestoration";
+import { useAuthStore } from "@/stores/authStore";
+import type { PaginatedPost, PostsResponse, SerializedPost } from "@/types";
+import React, { useCallback, useEffect, useState } from "react";
+import { FiSearch } from "react-icons/fi";
+import { useNavigate, useSearchParams } from "react-router";
 
 // Type guard: PostsResponse may be PaginatedPost or { error: string }
 function isPaginatedPost(
@@ -77,34 +77,17 @@ export default function Feed() {
   /* -------------------------
     URL sync
  ------------------------- */
-
-  const initializedRef = useRef(false);
-
   useEffect(() => {
-    const params: Record<string, string> = {
-      page: String(page || 1),
-    };
-    if (searchInput) params.search = searchInput;
+    const params = new URLSearchParams();
 
-    // First mount → initialize URL without adding history entries
-    if (!initializedRef.current) {
-      setSearchParams(params, { replace: true });
-      initializedRef.current = true;
-      return;
+    params.set("page", String(page));
+
+    if (searchInput.trim().length > 0) {
+      params.set("search", searchInput.trim());
     }
 
-    // Compare current params to avoid unnecessary updates
-    const current = Object.fromEntries(searchParams.entries());
-    const next = params;
-
-    const changed =
-      Object.keys(next).length !== Object.keys(current).length ||
-      Object.entries(next).some(([k, v]) => current[k] !== v);
-
-    if (changed) {
-      setSearchParams(params, { replace: true });
-    }
-  }, [page, searchInput, setSearchParams, searchParams]);
+    setSearchParams(params, { replace: true });
+  }, [page, searchInput, setSearchParams]);
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,10 +109,6 @@ export default function Feed() {
     },
     [navigate, searchInput],
   );
-
-  /* -------------------------
-     UI
-  ------------------------- */
 
   return (
     <section className="flex flex-col items-center w-full">
@@ -156,7 +135,7 @@ export default function Feed() {
         </InputGroupAddon>
       </InputGroup>
 
-      <Badge className="px-3 mt-4 text-base h-7">Published</Badge>
+      <Badge className="px-3 mt-4 text-base h-7 mb-4!">Published</Badge>
 
       {/* Pagination */}
       {feedPagination && feedPagination.totalPages > 1 && (
@@ -170,49 +149,59 @@ export default function Feed() {
         />
       )}
 
-      <ul className="flex flex-col gap-4">
-        {feedPosts.length > 0 ? (
-          feedPosts.map((post) => (
-            <Card key={post.id} className="p-4">
-              <li>
-                <header>
-                  <div className="flex flex-col items-center gap-2 mb-4 md:flex-row md:flex-nowrap md:justify-between md:gap-0">
-                    <div className="flex gap-4">
-                      {post.status === "published" &&
-                        post.id &&
-                        post.author && (
-                          <LikeButton
-                            postAuthorId={post.author.id.toString()}
+      <div
+        data-state={feedQuery.isFetching ? "loading" : "loaded"}
+        className="
+          transition-opacity duration-200
+          data-[state=loading]:opacity-50
+          data-[state=loaded]:opacity-100
+        "
+      >
+        <ul className="flex flex-col gap-4">
+          {feedPosts.length > 0 ? (
+            feedPosts.map((post) => (
+              <Card key={post.id} className="p-4">
+                <li>
+                  <header>
+                    <div className="flex flex-col items-center gap-2 mb-4 md:flex-row md:flex-nowrap md:justify-between md:gap-0">
+                      <div className="flex gap-4">
+                        {post.status === "published" &&
+                          post.id &&
+                          post.author && (
+                            <LikeButton
+                              postAuthorId={post.author.id}
+                              postId={post.id}
+                              liked={post.liked || false}
+                              likeCount={post.likeCount || 0}
+                              isAuthenticated={isAuthenticated}
+                            />
+                          )}
+                        {/* PDF Download Button */}
+                        {post.id && (
+                          <CustomPdfButton
                             postId={post.id}
-                            liked={post.liked || false}
-                            likeCount={post.likeCount || 0}
-                            isAuthenticated={isAuthenticated}
+                            postTitle={post.title}
                           />
                         )}
-                      {post.id && (
-                        <CustomPdfButton
-                          postId={post.id}
-                          postTitle={post.title}
-                        />
-                      )}
+                      </div>
                     </div>
-                  </div>
 
-                  <AuthorForPost post={post} />
-                </header>
+                    <AuthorForPost post={post} />
+                  </header>
 
-                <PostContent content={post.content} />
-              </li>
-            </Card>
-          ))
-        ) : (
-          <li>
-            {searchInput
-              ? `No posts found for "${searchInput}"`
-              : "No published posts yet"}
-          </li>
-        )}
-      </ul>
+                  <PostContent content={post.content} />
+                </li>
+              </Card>
+            ))
+          ) : (
+            <li>
+              {searchInput
+                ? `No posts found for "${searchInput}"`
+                : "No published posts yet"}
+            </li>
+          )}
+        </ul>
+      </div>
     </section>
   );
 }
