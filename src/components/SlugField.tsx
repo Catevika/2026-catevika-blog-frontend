@@ -1,12 +1,12 @@
-import { LuRotateCcw } from "react-icons/lu";
-import type React from "react";
-import { useCallback, useId, useState, useRef } from "react";
-import { useSlugAvailability } from "@/hooks/useSlugAvailability";
-import { slugifyFinal } from "@/utils/slugUtils";
-import type { SlugFieldProps } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
+import { useSlugAvailability } from "@/hooks/useSlugAvailability";
+import type { SlugFieldProps } from "@/types";
+import { slugifyFinal } from "@/utils/slugUtils";
+import type React from "react";
+import { useCallback, useId, useRef, useState } from "react";
+import { LuRotateCcw } from "react-icons/lu";
 
 const SlugField: React.FC<SlugFieldProps> = ({
   title,
@@ -130,7 +130,7 @@ const SlugField: React.FC<SlugFieldProps> = ({
 
         {loading && <div>Checking availability…</div>}
 
-        {/* ⭐ FIX: show suggestion whenever suggestion exists */}
+        {/* show suggestion whenever suggestion exists */}
         {!loading && suggestion && (
           <div className="text-red-600 flex items-center gap-1">
             <span>⚠️</span>

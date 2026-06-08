@@ -1,6 +1,6 @@
+import { Button } from "@/components/ui/button";
 import type { PaginationProps } from "@/types";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { Button } from "@/components/ui/button";
 
 export function Pagination({
   handlePrevPage,

@@ -1,18 +1,4 @@
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useId,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
-import rehypeRaw from "rehype-raw";
-import rehypeSanitize from "rehype-sanitize";
-import rehypeSlug from "rehype-slug";
-import remarkGfm from "remark-gfm";
 import { uploaderApi } from "@/api/uploaderApi";
-import type { ImageUploadResponse, PostFormProps, PostStatus } from "@/types";
 import MarkdownImage from "@/components/MarkdownImage";
 import MarkdownLink from "@/components/MarkdownLink";
 import PostActions from "@/components/PostActions";
@@ -27,6 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Field, FieldLabel } from "@/components/ui/field";
 import {
   Select,
   SelectContent,
@@ -36,11 +23,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Field, FieldLabel } from "@/components/ui/field";
+import type { ImageUploadResponse, PostFormProps, PostStatus } from "@/types";
 import MDEditor from "@uiw/react-md-editor";
-import { InputGroup, InputGroupInput } from "./ui/input-group";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
+import { InputGroup, InputGroupInput } from "./ui/input-group";
 
 // Global dragged file slot used by drag/drop between windows
 export interface PostFormHandle {

@@ -1,5 +1,5 @@
-import { forwardRef } from "react";
 import type { CustomButtonProps } from "@/types";
+import { forwardRef } from "react";
 
 const CustomButton = forwardRef<HTMLButtonElement, CustomButtonProps>(
   ({ icon: Icon, className, disabled, text, ...props }, ref) => {

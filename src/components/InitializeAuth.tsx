@@ -1,7 +1,7 @@
-import { Outlet } from "react-router";
-import { useEffect, useRef } from "react";
 import { useMe } from "@/hooks/useAuthForm";
 import { useAuthStore } from "@/stores/authStore";
+import { useEffect, useRef } from "react";
+import { Outlet } from "react-router";
 
 export default function InitializeAuth() {
   const setUser = useAuthStore((s) => s.setUser);

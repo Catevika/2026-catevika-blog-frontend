@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { slugifyFinal } from "@/utils/slugUtils";
 import { useDebounce } from "@/hooks/useDebounce";
 import type { SlugAvailability } from "@/types";
+import { slugifyFinal } from "@/utils/slugUtils";
+import { useEffect, useRef, useState } from "react";
 
 export const useSlugAvailability = (
   value: string,

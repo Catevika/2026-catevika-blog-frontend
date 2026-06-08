@@ -1,5 +1,5 @@
-import type { PostPaginationProps } from "@/types";
 import Pagination from "@/components/Pagination";
+import type { PostPaginationProps } from "@/types";
 
 const PostsPagination = ({
   page,

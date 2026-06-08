@@ -1,5 +1,5 @@
-import type { PexelsPhotoCardProps } from "@/types";
 import { Button } from "@/components/ui/button";
+import type { PexelsPhotoCardProps } from "@/types";
 
 const PexelsPhotoCard = ({
   photo,

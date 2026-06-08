@@ -9,13 +9,13 @@ const MarkdownImage = ({ src, alt, ...props }: ComponentProps<"img">) => {
     <img
       src={src}
       alt={alt ?? ""}
-      className="my-2 h-auto max-h-96 max-w-full rounded-md object-cover md:max-h-125"
+      className="my-2 h-auto max-h-50 max-w-full rounded-md object-cover md:max-h-100"
       style={{
         display: "block",
         marginLeft: "auto",
         marginRight: "auto",
       }}
-      loading="lazy"
+      loading="eager"
       decoding="async"
       {...props}
       onError={(e) => {

@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
 import type { Post } from "@/types";
+import { useCallback, useState } from "react";
 
 export function usePostDraft(initial: Post | null) {
   const [draft, setDraft] = useState<Post | null>(initial);

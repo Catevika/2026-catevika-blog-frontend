@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,13 +10,14 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuthForm } from "@/hooks/useAuthForm";
+import { formatCooldown } from "@/utils/formatCooldown";
+import { useState } from "react";
 import { HiOutlineMail } from "react-icons/hi";
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import { TbLockPassword } from "react-icons/tb";
 import { VscEye, VscEyeClosed } from "react-icons/vsc";
-import { useAuthForm } from "@/hooks/useAuthForm";
 import { useNavigate } from "react-router";
-import { formatCooldown } from "@/utils/formatCooldown";
 
 export default function Auth() {
   const {

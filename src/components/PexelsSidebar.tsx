@@ -1,21 +1,21 @@
-import { useEffect, useId, useState } from "react";
-import { Link } from "react-router";
-import { useDebounce } from "@/hooks/useDebounce";
-import { usePexelsSearch } from "@/hooks/usePexelsSearch";
-import type { PexelsPhoto, PexelsSidebarProps } from "@/types";
-import { usePexelsSearchStore } from "@/stores/pexelsStore";
 import CustomButton from "@/components/CustomButton";
 import ImageUploader from "@/components/ImageUploader";
 import LightBox from "@/components/LightBox";
 import Pagination from "@/components/Pagination";
 import PexelsPhotoCard from "@/components/PexelsPhotoCard";
-import { FiSearch } from "react-icons/fi";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useDebounce } from "@/hooks/useDebounce";
+import { usePexelsSearch } from "@/hooks/usePexelsSearch";
+import { usePexelsSearchStore } from "@/stores/pexelsStore";
+import type { PexelsPhoto, PexelsSidebarProps } from "@/types";
+import { useEffect, useId, useState } from "react";
+import { FiSearch } from "react-icons/fi";
+import { Link } from "react-router";
 
 const PexelsSidebar = ({ onInsert }: PexelsSidebarProps) => {
   const query = usePexelsSearchStore((s) => s.query);

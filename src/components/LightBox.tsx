@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from "react";
-import type { LightBoxProps } from "@/types";
 import CustomButton from "@/components/CustomButton";
+import type { LightBoxProps } from "@/types";
+import { useCallback, useEffect, useRef } from "react";
 
 const LightBox = ({ enlargedPhoto, handleCloseEnlarge }: LightBoxProps) => {
   const dialogRef = useRef<HTMLDivElement | null>(null);

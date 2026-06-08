@@ -27,13 +27,17 @@ export default defineConfig(({ mode }) => {
                   const retry = proxyRes.headers["retry-after"];
                   if (retry) {
                     console.log("Proxy forwarding Retry-After:", retry);
+                  } else {
+                    // If backend did NOT send a Retry-After header,
+                    // ensure no stale header is forwarded
+                    delete proxyRes.headers["retry-after"];
+                    return;
                   }
                 });
               },
             },
           },
     },
-
     test: {
       environment: "jsdom",
       globals: true,

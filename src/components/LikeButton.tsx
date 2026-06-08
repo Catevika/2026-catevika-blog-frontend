@@ -1,10 +1,9 @@
 import { useLikePostMutation } from "@/api/postHooks";
+import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
 import type { LikeButtonProps } from "@/types";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { BsChatSquareHeart } from "react-icons/bs";
-import { AiOutlineHeart } from "react-icons/ai";
-import { AiFillHeart } from "react-icons/ai";
-import { Button } from "@/components/ui/button";
 
 const LikeButton = ({
   postId,
@@ -30,7 +29,7 @@ const LikeButton = ({
         variant="default"
         title={
           !isAuthenticated
-            ? "Login to like"
+            ? "Log in to like"
             : isOwner
               ? "Cannot like your own post"
               : ""

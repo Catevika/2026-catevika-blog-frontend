@@ -1,6 +1,6 @@
+import { useAuthStore } from "@/stores/authStore";
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { useAuthStore } from "@/stores/authStore";
 
 const ProtectedRoute = () => {
   const navigate = useNavigate();

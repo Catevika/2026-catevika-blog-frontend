@@ -1,7 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { usePdfDownload } from "@/hooks/usePdfDownLoad";
 import type { CustomPdfButtonProps } from "@/types";
 import { BiDownload } from "react-icons/bi";
-import { Button } from "@/components/ui/button";
 
 const CustomPdfButton = ({ postId, postTitle }: CustomPdfButtonProps) => {
   const { downloadPdf, isGeneratingPdf, pdfError, clearPdfError } =
@@ -18,7 +18,7 @@ const CustomPdfButton = ({ postId, postTitle }: CustomPdfButtonProps) => {
   };
 
   return (
-    <>
+    <div className="flex flex-col items-center">
       <Button
         variant="default"
         onClick={handlePdfDownload}
@@ -38,7 +38,7 @@ const CustomPdfButton = ({ postId, postTitle }: CustomPdfButtonProps) => {
 
       {/* PDF Error Display - renders only when error exists */}
       {pdfError && (
-        <div className="flex items-center justify-between mb-4 form-error">
+        <div className="flex flex-col items-center justify-between mb-4 form-error">
           <span>{pdfError}</span>
           <button
             type="button"
@@ -50,7 +50,7 @@ const CustomPdfButton = ({ postId, postTitle }: CustomPdfButtonProps) => {
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

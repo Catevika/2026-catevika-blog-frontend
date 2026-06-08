@@ -1,6 +1,6 @@
+import type { SerializedPost, SerializedUser } from "@/types";
 import { TfiPencil } from "react-icons/tfi";
 import { Link } from "react-router";
-import type { SerializedPost, SerializedUser } from "@/types";
 
 const CustomEditLink = ({
   post,

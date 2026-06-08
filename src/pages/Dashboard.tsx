@@ -6,9 +6,9 @@ import {
   ItemContent,
   ItemHeader,
 } from "@/components/ui/item";
-import { Link } from "react-router";
-import { SlArrowRight } from "react-icons/sl";
 import { useAuthStore } from "@/stores/authStore";
+import { SlArrowRight } from "react-icons/sl";
+import { Link } from "react-router";
 
 export default function Dashboard() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -36,7 +36,7 @@ export default function Dashboard() {
         </figcaption>
       </figure>
       <div className="block m-5 sm:absolute sm:inset-0 sm:flex sm:flex-col sm:items-center sm:flex-wrap">
-        <div className="sm:pb-25 dark:text-secondary">
+        <div className="sm:pb-25 dark:text-foreground! dark:sm:text-background!">
           <TypographyH1>Welcome&nbsp;to&nbsp;my Tech&nbsp;Blog!</TypographyH1>
         </div>
         <Item

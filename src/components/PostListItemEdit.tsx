@@ -1,8 +1,8 @@
-import type { SerializedPost } from "@/types";
-import { Link } from "react-router";
 import AuthorForList from "@/components/AuthorForList";
 import CustomEditLink from "@/components/CustomEditLink";
 import { useAuthStore } from "@/stores/authStore";
+import type { SerializedPost } from "@/types";
+import { Link } from "react-router";
 
 const PostListItem = ({ post }: { post: SerializedPost }) => {
   const user = useAuthStore((s) => s.user);

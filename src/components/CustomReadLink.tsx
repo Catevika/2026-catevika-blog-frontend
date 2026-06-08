@@ -1,6 +1,6 @@
+import type { SerializedPost } from "@/types";
 import { LiaBookOpenSolid } from "react-icons/lia";
 import { Link } from "react-router";
-import type { SerializedPost } from "@/types";
 
 const CustomReadLink = ({ post }: { post: SerializedPost }) => {
   return (

@@ -1,5 +1,5 @@
-import type { PostActionsProps } from "@/types";
 import { Button } from "@/components/ui/button";
+import type { PostActionsProps } from "@/types";
 
 export default function PostActions({
   isSaving,
@@ -12,7 +12,7 @@ export default function PostActions({
       aria-label="Post editing actions"
     >
       <Button
-        variant={"secondary"}
+        variant="secondary"
         type="button"
         onClick={onCancel}
         disabled={Boolean(isSaving)}
@@ -22,7 +22,7 @@ export default function PostActions({
       </Button>
       <Button
         type="reset"
-        variant={"destructive"}
+        variant="destructive"
         onClick={onReset}
         disabled={Boolean(isSaving)}
         aria-label="Reset form to original values"

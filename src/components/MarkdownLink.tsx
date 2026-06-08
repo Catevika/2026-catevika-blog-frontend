@@ -1,5 +1,5 @@
-import * as React from "react";
 import type { MarkdownLinkProps } from "@/types";
+import * as React from "react";
 
 // Helpers — all SSR-safe
 const hasWindow = typeof window !== "undefined";

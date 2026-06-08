@@ -1,7 +1,6 @@
-import { PiMoon } from "react-icons/pi";
-import { PiSun } from "react-icons/pi";
-import { useTheme } from "@/hooks/useTheme";
 import PexelsLogo from "@/components/PexelsLogo";
+import { useTheme } from "@/hooks/useTheme";
+import { PiMoon, PiSun } from "react-icons/pi";
 
 export default function ThemeButton() {
   const { theme, setTheme } = useTheme();

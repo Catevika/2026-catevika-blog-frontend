@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useRef, useEffect, useState } from "react";
-import type { Post, UseSlugControlProps } from "@/types";
+import type { SerializedPost, UseSlugControlProps } from "@/types";
 import { slugifyFinal, slugifyLive } from "@/utils/slugUtils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export const useSlugControl = ({
   postId,
@@ -53,8 +53,8 @@ export const useSlugControl = ({
 
   const handleTitleChange = useCallback(
     (value: string) => {
-      updateDraft((d: Post) => {
-        const updates: Partial<Post> = { title: value };
+      updateDraft((d: SerializedPost) => {
+        const updates: Partial<SerializedPost> = { title: value };
 
         if (d.locked) {
           const newAuto = slugifyFinal(value);
@@ -102,9 +102,9 @@ export const useSlugControl = ({
   );
 
   const toggleSlugLocked = useCallback(() => {
-    updateDraft((d: Post) => {
+    updateDraft((d: SerializedPost) => {
       const newLocked = !d.locked;
-      const updates: Partial<Post> = { locked: newLocked };
+      const updates: Partial<SerializedPost> = { locked: newLocked };
 
       if (newLocked) {
         const newAuto = slugifyFinal(d.title || "");
