@@ -1,3 +1,4 @@
+import type { useCreateComment } from "@/api/commentHooks";
 import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
@@ -66,14 +67,15 @@ export interface SerializedUser {
   name: string;
   email: string;
   role: "user" | "admin";
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 //------------------------------------------------------------
 // Posts - Post Form
 //------------------------------------------------------------
 export interface PostFormValues {
+  id?: string;
   title: string;
   slug: string;
   locked?: boolean;
@@ -83,24 +85,23 @@ export interface PostFormValues {
   authorId: string;
 }
 
-export interface UseSlugControlProps {
-  postId: string;
-  draft: Post | undefined;
-  updateDraft: (draft: (draft: Post) => Partial<Post>) => void;
+export interface PostEditHeaderProps {
+  isNew: boolean;
+  status: "draft" | "published";
 }
 
 export interface PostFormProps {
   slug: string;
   locked: boolean;
   theme?: "light" | "dark";
-  draft?: Post | undefined;
+  draft?: SerializedPost | undefined;
   originalTitle?: string;
   originalContent?: string;
   originalStatus?: "published" | "draft";
   isNew: boolean;
   isSaving?: boolean;
   postId?: string;
-  saveError?: string;
+  saveError?: string | null;
   onTitleChange: (title: string) => void;
   onStatusChange: (status: "draft" | "published") => void;
   onSlugInput: (slug: string) => void;
@@ -176,8 +177,8 @@ export interface SerializedPost {
   likeCount: number;
   liked: boolean;
   likedBy: string[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export interface Pagination {
@@ -207,7 +208,7 @@ export interface LikePostResponse {
 }
 
 export interface LikeMutationContext {
-  previousPost?: Post;
+  previousPost?: SerializedPost;
 }
 
 export type PostCreateResponse =
@@ -242,6 +243,182 @@ export interface PostPaginationProps extends Pick<
 }
 
 //------------------------------------------------------------
+// Comments
+//------------------------------------------------------------
+
+export interface Comment {
+  id: string;
+  postId: string;
+
+  authorId: string | null;
+  author: {
+    id: string;
+    name?: string;
+    email: string;
+  } | null;
+
+  content: string;
+  liked: boolean;
+  likedBy: string[];
+  likeCount: number;
+
+  parentId: string | null;
+  depth: number;
+  deleted: boolean;
+
+  replyCount: number;
+  hasReplies: boolean;
+
+  createdAt: string; // ISO string from backend
+  updatedAt: string; // ISO string from backend
+}
+
+export interface SerializedComment {
+  id: string;
+  content: string;
+  postId: string;
+  authorId: string;
+  author: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  liked: boolean;
+  likedBy: string[];
+  likeCount: number;
+  status: string;
+  parentId: string | null;
+  depth: number;
+  replies?: SerializedComment[];
+  deleted: boolean;
+  createdAt: string; // ISO string from backend
+  updatedAt: string; // ISO string from backend
+}
+
+export interface CommentsResponse {
+  success: boolean;
+  comments: SerializedComment[];
+  total: number;
+}
+
+export interface CommentsHeaderProps {
+  totalComments: number;
+  isFetching: boolean;
+  onRefresh: () => void;
+}
+
+export interface LikeResponse {
+  success: boolean;
+  liked: boolean;
+  likedBy: string[];
+  likeCount: number;
+  comment: SerializedComment;
+}
+
+export interface PaginatedCommentsResponse {
+  success: boolean;
+  comments: SerializedComment[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+  pages: number;
+}
+
+export interface InfiniteCommentsData {
+  pages: PaginatedCommentsResponse[];
+  pageParams: number[];
+  total: number;
+}
+
+export interface CommentFormSectionProps {
+  isPostAuthor: boolean;
+  createCommentMutation: ReturnType<typeof useCreateComment>;
+}
+
+export interface CommentFormProps {
+  initialContent?: string;
+  parentId?: string;
+  onSubmit: (data: { content: string; parentId?: string }) => void;
+  isLoading: boolean;
+  placeholder?: string;
+  onClose?: () => void;
+}
+
+export interface CommentItemProps {
+  comment: SerializedComment;
+  postId: string;
+  parent?: SerializedComment | null;
+}
+
+export interface CommentListProps {
+  comments: SerializedComment[];
+  postId: string;
+}
+
+export interface CommentsErrorBoundaryProps {
+  error: FetchError | null;
+  onRetry: () => void;
+}
+
+export interface CommentsSectionProps {
+  postId: string;
+  postAuthorId: string | undefined;
+}
+
+export interface CommentLikeButtonProps {
+  comment: SerializedComment;
+  postId: string;
+  className?: string;
+}
+
+export interface CommentTreeProps {
+  comments: SerializedComment[];
+  postId: string;
+}
+
+export interface CommentNodeProps {
+  comment: SerializedComment;
+  postId: string;
+  parent?: SerializedComment | null;
+}
+
+export interface LikeButtonProps {
+  postId: string;
+  postAuthorId: string | undefined;
+  liked: boolean;
+  likeCount: string[] | number;
+  isAuthenticated: boolean;
+}
+
+export interface CustomPdfButtonProps {
+  postId: string;
+  postTitle: string;
+}
+
+export interface CustomDeleteButtonProps {
+  postId: string;
+  postTitle: string;
+  postStatus: string;
+  authorId: string | undefined;
+  userId: string | undefined;
+}
+
+export interface PostContentProps {
+  content: string;
+  className?: string;
+}
+
+// ---------------------------------------------------------
+// Error type
+// ---------------------------------------------------------
+
+export interface FetchError extends Error {
+  status?: number;
+  headers?: Headers;
+}
+
+//------------------------------------------------------------
 // Custom Buttons
 //------------------------------------------------------------
 export interface CustomButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -257,7 +434,7 @@ export interface CustomPdfButtonProps {
 
 export interface LikeButtonProps {
   postId: string;
-  postAuthorId: string;
+  postAuthorId: string | undefined;
   liked: boolean;
   likeCount: string[] | number;
   isAuthenticated: boolean;
@@ -364,8 +541,10 @@ export interface LightBoxProps {
 //------------------------------------------------------------
 export interface UseSlugControlProps {
   postId: string;
-  draft: Post | undefined;
-  updateDraft: (draft: (draft: Post) => Partial<Post>) => void;
+  draft: SerializedPost | undefined;
+  updateDraft: (
+    draft: (draft: SerializedPost) => Partial<SerializedPost>,
+  ) => void;
 }
 
 //------------------------------------------------------------

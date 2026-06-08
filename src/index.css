@@ -254,10 +254,23 @@ code {
     color: #16171d !important;
   }
 
-  #post-content{
+  #post-content {
+    & .md-editor-columns .w-md-editor,
+    textarea.w-md-editor-text-input {
+      display: flex !important;
+      flex-direction: row !important;
+    }
+    
+    & .md-editor-columns .w-md-editor-content {
+      display: flex !important;
+      flex-direction: row !important;
+      width: 100%;
+    }
+
     /* replace the editor background */
-    & .wmde-markdown-color p {
-      @apply bg-transparent dark:bg-card dark:text-foreground;
+    & div:not(div > pre > *) {
+      background-color: var(--card) !important;
+      color: var(--foreground) !important;
     }
 
     /* center image and caption */
@@ -347,6 +360,42 @@ code {
     }
   }
 
+  #commentItem {
+    .author-avatar {
+      @apply bg-primary text-secondary dark:text-primary flex h-10 w-10 items-center justify-center rounded-full;
+    }
+
+    .comment-content {
+      @apply mb-6 max-w-none text-xl leading-relaxed;
+    }
+
+    .replies {
+      @apply border-primary mt-4 ml-8 border-l-2 pl-4;
+    }
+
+    .reply-form-container {
+      @apply border-primary mt-6 border-t pt-6;
+    }
+  }
+
+  #commentsSection {
+    .message-login {
+      @apply border-accent bg-accent/5 mb-4 rounded-md border px-4 py-6;
+    }
+  }
+
+  #commentFormSection {
+    @apply border-accent mb-4 flex h-fit flex-col gap-2 rounded-md border p-4;
+
+    .post-author-badge {
+      @apply bg-primary text-secondary dark:text-primary inline-flex items-center gap-1 rounded-full px-3 py-1 text-lg font-semibold tracking-wider;
+    }
+  }
+
+  #commentErrorBoundary {
+    @apply border-destructive/50 bg-destructive/5 mb-6 rounded-md border p-4;
+  }
+
   #pexels-sidebar {
     @apply flex flex-col p-1 lg:h-full lg:w-74 lg:border-r;
     & .pexels-sidebar-input {
@@ -408,6 +457,52 @@ code {
 
   .form-error {
     @apply text-destructive rounded-md p-2 text-lg;
+  }
+}
+
+/* Pdf export styles */
+@page {
+  size: A4;
+  margin: 15mm;
+}
+
+@media print {
+  #post-export {
+    page-break-inside: avoid;
+    break-inside: avoid;
+
+    & h1 , h2 , h3 , h4 , h5 , h6 {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    & h1 + *, h2 + *, h3 + *, h4 + *, h5 + *, h6 + * {
+      break-before: avoid;
+      page-break-before: avoid;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    & h1 + * + *, h2 + * + *, h3 + * + *, h4 + * + *, h5 + * + *, h6 + * + * {
+      break-inside: avoid;
+    }
+
+    & img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      content-visibility: visible !important;
+    }
+
+    & div:not(div > pre > *), div:not(table > *),
+    #post-content.dark > *,
+    .wmde-markdown.wmde-markdown-color > * {
+      --foreground: oklch(0.141 0.005 285.823);
+      --card: oklch(1 0 0);
+
+      background-color: var(--card) !important;
+      color: var(--foreground) !important;
+    }
   }
 }
 
