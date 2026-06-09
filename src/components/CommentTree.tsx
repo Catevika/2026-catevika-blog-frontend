@@ -1,9 +1,9 @@
+import { useState } from "react";
 import type {
   CommentNodeProps,
   CommentTreeProps,
   SerializedComment,
 } from "@/types";
-import { useState } from "react";
 import CommentItem from "./CommentItem";
 
 export function CommentTree({ comments, postId }: CommentTreeProps) {

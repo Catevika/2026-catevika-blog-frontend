@@ -8,71 +8,62 @@ import type { CommentLikeButtonProps } from "../types";
 export default function CommentLikeButton({
   comment,
   postId,
+  parent,
   className = "",
 }: CommentLikeButtonProps) {
   const user = useAuthStore((s) => s.user);
-  const toggleLikeMutation = useToggleCommentLike(postId, comment.id, user?.id);
+  const userId = user?.id ?? "";
 
-  const isOwner = user?.id === comment.authorId;
-  const isDisabled = isOwner || toggleLikeMutation.isPending;
+  const toggleLikeMutation = useToggleCommentLike(
+    postId,
+    comment.id,
+    userId,
+    parent?.id ?? null,
+  );
+
+  const isAuthor = userId === comment.authorId;
+
+  // Normalize likedBy to strings
+  const likedBy = comment.likedBy.map((id) => id.toString());
+
+  const youLiked = likedBy.includes(userId);
+  const othersLiked = likedBy.filter((id) => id !== userId).length > 0;
+
+  const isDisabled = toggleLikeMutation.isPending || isAuthor;
 
   const handleLike = () => {
-    if (isOwner) return;
+    if (isAuthor) return;
     toggleLikeMutation.mutate();
   };
 
-  return (
-    <>
-      <button
-        type="button"
-        onClick={handleLike}
-        disabled={isDisabled}
-        className={cn(
-          "flex items-center gap-2 font-medium disabled:cursor-not-allowed disabled:opacity-100!",
-          className,
-        )}
-        aria-label={
-          isOwner
-            ? "Cannot like your own comment"
-            : comment.liked
-              ? "Unlike comment"
-              : "Like comment"
-        }
-        aria-live="polite"
-        aria-describedby={
-          toggleLikeMutation.isPending ? "like-status" : undefined
-        }
-      >
-        {isOwner ? (
-          <BsChatSquareHeart
-            size={24}
-            className="like-IsOwner-icon"
-            aria-hidden="true"
-          />
-        ) : comment.liked ? (
-          <AiFillHeart
-            size={24}
-            className="like-Liked-icon"
-            aria-hidden="true"
-          />
-        ) : (
-          <AiOutlineHeart
-            size={24}
-            className="like-NotLiked-icon"
-            aria-hidden="true"
-          />
-        )}
-        <span>{comment.likeCount}</span>
+  let icon;
 
-        {toggleLikeMutation.isPending && (
-          <span id="like-status" className="sr-only">
-            Updating likes...
-          </span>
-        )}
-      </button>
-      {!user ? (
-        <p className="text-sm sm:hidden">(Log in to like comments)</p>
-      ) : null}
-    </>
+  if (isAuthor) {
+    icon = othersLiked ? (
+      <BsChatSquareHeart size={24} />
+    ) : (
+      <AiOutlineHeart size={24} />
+    );
+  } else if (youLiked) {
+    icon = <AiFillHeart size={24} />;
+  } else if (othersLiked) {
+    icon = <BsChatSquareHeart size={24} />;
+  } else {
+    icon = <AiOutlineHeart size={24} />;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleLike}
+      disabled={isDisabled}
+      className={cn(
+        "flex items-center gap-2 font-medium disabled:cursor-not-allowed disabled:opacity-100!",
+        className,
+      )}
+    >
+      {icon}
+      <span>{likedBy.length}</span>
+    </button>
   );
 }

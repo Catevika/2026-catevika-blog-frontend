@@ -5,32 +5,37 @@ import {
   toggleCommentLike,
   updateComment,
 } from "@/api/commentApi";
-import type { SerializedComment } from "@/types";
+import type { LikeResponse, SerializedComment } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-// Recursively updates a comment inside a nested comment tree
-function updateCommentInTree(
+export function updateCommentInTree(
   comments: SerializedComment[],
-  commentId: string,
+  targetId: string,
   updater: (c: SerializedComment) => SerializedComment,
 ): SerializedComment[] {
-  return comments.map((comment) => {
-    if (comment.id === commentId) {
-      return updater(comment);
+  let changed = false;
+
+  const newComments = comments.map((c) => {
+    if (c.id === targetId) {
+      changed = true;
+      return updater(c);
     }
 
-    if (comment.replies && comment.replies.length > 0) {
-      return {
-        ...comment,
-        replies: updateCommentInTree(comment.replies, commentId, updater),
-      };
+    if (c.replies?.length) {
+      const updatedReplies = updateCommentInTree(c.replies, targetId, updater);
+
+      if (updatedReplies !== c.replies) {
+        changed = true;
+        return { ...c, replies: updatedReplies };
+      }
     }
 
-    return comment;
+    return c;
   });
+
+  return changed ? newComments : [...newComments];
 }
 
-// Fetch the full nested comment tree
 export function useComments(postId: string, userId?: string) {
   return useQuery<SerializedComment[]>({
     queryKey: ["comments", postId],
@@ -39,7 +44,6 @@ export function useComments(postId: string, userId?: string) {
   });
 }
 
-// Create a new comment or reply
 export function useCreateComment(postId: string) {
   const queryClient = useQueryClient();
 
@@ -47,13 +51,15 @@ export function useCreateComment(postId: string) {
     mutationFn: (data: { content: string; parentId?: string }) =>
       createComment(postId, data),
 
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["comments", postId],
+        exact: false,
+      });
     },
   });
 }
 
-// Edit or delete a comment inside a nested tree
 export function useUpdateComment(postId: string, commentId: string) {
   const queryClient = useQueryClient();
 
@@ -62,7 +68,10 @@ export function useUpdateComment(postId: string, commentId: string) {
       updateComment(postId, commentId, data),
 
     onMutate: async (data) => {
-      await queryClient.cancelQueries({ queryKey: ["comments", postId] });
+      await queryClient.cancelQueries({
+        queryKey: ["comments", postId],
+        exact: false,
+      });
 
       const previous = queryClient.getQueryData<SerializedComment[]>([
         "comments",
@@ -71,7 +80,6 @@ export function useUpdateComment(postId: string, commentId: string) {
 
       if (!previous) return { previous };
 
-      // DELETE
       if (data.deleted) {
         const remove = (list: SerializedComment[]): SerializedComment[] =>
           list
@@ -84,7 +92,6 @@ export function useUpdateComment(postId: string, commentId: string) {
         queryClient.setQueryData(["comments", postId], remove(previous));
       }
 
-      // EDIT
       if (data.content !== undefined) {
         queryClient.setQueryData(
           ["comments", postId],
@@ -105,61 +112,102 @@ export function useUpdateComment(postId: string, commentId: string) {
       }
     },
 
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["comments", postId],
+        exact: false,
+      });
     },
   });
 }
 
-// Optimistic like toggle inside a nested tree
 export function useToggleCommentLike(
   postId: string,
   commentId: string,
   userId?: string,
+  parentId?: string | null,
 ) {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: () => toggleCommentLike(postId, commentId),
+  return useMutation<
+    LikeResponse,
+    Error,
+    void,
+    { previousComments?: SerializedComment[] }
+  >({
+    mutationFn: async () => {
+      if (!userId) throw new Error("Must be logged in to like");
+      return toggleCommentLike(postId, commentId);
+    },
 
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["comments", postId] });
+      if (!userId) return {};
 
-      const previous = queryClient.getQueryData<SerializedComment[]>([
+      await queryClient.cancelQueries({
+        queryKey: ["comments", postId],
+        exact: false,
+      });
+
+      const previousComments = queryClient.getQueryData<SerializedComment[]>([
         "comments",
         postId,
       ]);
 
-      if (!previous || !userId) return { previous };
+      if (!previousComments) return { previousComments };
 
-      queryClient.setQueryData(
-        ["comments", postId],
-        (old: SerializedComment[] | undefined) =>
-          updateCommentInTree(old ?? [], commentId, (c) => {
-            const alreadyLiked = c.likedBy.includes(userId);
+      const updated = updateCommentInTree(previousComments, commentId, (c) => {
+        const alreadyLiked = c.likedBy.includes(userId);
+        const newLikedBy = alreadyLiked
+          ? c.likedBy.filter((id) => id !== userId)
+          : [...c.likedBy, userId];
 
-            return {
-              ...c,
-              liked: !alreadyLiked,
-              likeCount: alreadyLiked ? c.likeCount - 1 : c.likeCount + 1,
-              likedBy: alreadyLiked
-                ? c.likedBy.filter((id) => id !== userId)
-                : [...c.likedBy, userId],
-            };
-          }),
-      );
+        return {
+          ...c,
+          likedBy: newLikedBy,
+          likeCount: newLikedBy.length,
+        };
+      });
 
-      return { previous };
+      const updatedWithParent =
+        parentId != null
+          ? updateCommentInTree(updated, parentId, (p) => ({ ...p }))
+          : updated;
+
+      queryClient.setQueryData(["comments", postId], updatedWithParent);
+
+      return { previousComments };
     },
 
     onError: (_err, _vars, ctx) => {
-      if (ctx?.previous) {
-        queryClient.setQueryData(["comments", postId], ctx.previous);
+      if (ctx?.previousComments) {
+        queryClient.setQueryData(["comments", postId], ctx.previousComments);
       }
     },
 
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+    onSuccess: async (data) => {
+      queryClient.setQueryData<SerializedComment[]>(
+        ["comments", postId],
+        (old) =>
+          old
+            ? updateCommentInTree(old, commentId, (c) => ({
+                ...c,
+                likedBy: data.likedBy,
+                likeCount: data.likeCount,
+              }))
+            : old,
+      );
+
+      await queryClient.invalidateQueries({
+        queryKey: ["comments", postId],
+        exact: false,
+      });
+    },
+
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["comments", postId],
+        exact: false,
+      });
     },
   });
 }
@@ -169,8 +217,26 @@ export function useDeleteComment(postId: string) {
 
   return useMutation({
     mutationFn: (commentId: string) => deleteComment(postId, commentId),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+
+    onMutate: async () => {
+      await queryClient.cancelQueries({
+        queryKey: ["comments", postId],
+        exact: false,
+      });
+    },
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["comments", postId],
+        exact: false,
+      });
+    },
+
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["comments", postId],
+        exact: false,
+      });
     },
   });
 }

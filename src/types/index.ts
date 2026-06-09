@@ -199,7 +199,7 @@ export interface PaginatedPost {
 
 export type PostsResponse = PaginatedPost | { error: string };
 
-export interface LikePostResponse {
+export interface LikeResponse {
   success: boolean;
   userId: string;
   liked: boolean;
@@ -303,8 +303,6 @@ export interface CommentsResponse {
 
 export interface CommentsHeaderProps {
   totalComments: number;
-  isFetching: boolean;
-  onRefresh: () => void;
 }
 
 export interface LikeResponse {
@@ -369,6 +367,7 @@ export interface CommentsSectionProps {
 export interface CommentLikeButtonProps {
   comment: SerializedComment;
   postId: string;
+  parent?: SerializedComment | null;
   className?: string;
 }
 
@@ -386,7 +385,7 @@ export interface CommentNodeProps {
 export interface LikeButtonProps {
   postId: string;
   postAuthorId: string | undefined;
-  liked: boolean;
+  likedBy: string[];
   likeCount: string[] | number;
   isAuthenticated: boolean;
 }
@@ -430,14 +429,6 @@ export interface CustomButtonProps extends ButtonHTMLAttributes<HTMLButtonElemen
 export interface CustomPdfButtonProps {
   postId: string;
   postTitle: string;
-}
-
-export interface LikeButtonProps {
-  postId: string;
-  postAuthorId: string | undefined;
-  liked: boolean;
-  likeCount: string[] | number;
-  isAuthenticated: boolean;
 }
 
 export interface PostContentProps {

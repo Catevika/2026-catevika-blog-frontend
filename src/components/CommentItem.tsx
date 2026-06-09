@@ -29,7 +29,7 @@ export default function CommentItem({
   parent,
 }: CommentItemProps) {
   const user = useAuthStore((s) => s.user);
-  const userId = user?.id; // your frontend user ID
+  const userId = user?.id;
 
   const [isEditing, setIsEditing] = useState(false);
   const [showReply, setShowReply] = useState(false);
@@ -63,12 +63,9 @@ export default function CommentItem({
      DELETED COMMENT RENDERING
   ------------------------------------------------------- */
   if (comment.deleted) {
-    // If it has replies, show "[deleted]" so the tree structure stays visible
     if (comment.replies && comment.replies.length > 0) {
       return <div className="py-2 text-muted-foreground italic">[deleted]</div>;
     }
-
-    // If no replies → render nothing
     return null;
   }
 
@@ -80,7 +77,7 @@ export default function CommentItem({
       <CommentForm
         key="edit-form"
         initialContent={editContent}
-        parentId={postId}
+        parentId={comment.parentId ?? undefined}
         onSubmit={(data) => {
           updateCommentMutation.mutate({ content: data.content });
           setIsEditing(false);
@@ -102,7 +99,7 @@ export default function CommentItem({
       <article
         id="commentItem"
         className={cn(
-          `rounded-md p-6 transition-all hover:shadow-md`,
+          "rounded-md p-6 transition-all hover:shadow-md",
           comment.depth === 1 ? "bg-accent/5" : "bg-none",
         )}
       >
@@ -136,7 +133,11 @@ export default function CommentItem({
 
         {/* Actions */}
         <footer className="flex items-center gap-4 text-sm">
-          <CommentLikeButton comment={comment} postId={postId} />
+          <CommentLikeButton
+            comment={comment}
+            postId={postId}
+            parent={parent}
+          />
 
           <div className="flex items-center gap-2">
             {canDelete && (

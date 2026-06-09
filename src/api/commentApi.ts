@@ -10,14 +10,16 @@ export async function getCommentsTree(
     ...(userId && { userId }),
   });
 
-  const response = await fetch(`${COMMENTS_BASE(postId)}/tree?${searchParams}`);
+  const response = await fetch(
+    `${COMMENTS_BASE(postId)}/tree?${searchParams}`,
+    { credentials: "include" },
+  );
 
   if (!response.ok) {
     throw new Error("Failed to fetch comment tree");
   }
 
   const data = (await response.json()) as { comments: SerializedComment[] };
-
   return data.comments;
 }
 
@@ -75,5 +77,5 @@ export const deleteComment = async (postId: string, commentId: string) => {
     throw new Error("Failed to delete comment");
   }
 
-  return res.json() as Promise<void>;
+  return (await res.json()) as Promise<void>;
 };

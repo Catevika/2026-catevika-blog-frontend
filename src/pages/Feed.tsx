@@ -171,7 +171,7 @@ export default function Feed() {
                             <LikeButton
                               postAuthorId={post.author.id}
                               postId={post.id}
-                              liked={post.liked || false}
+                              likedBy={post.likedBy || []}
                               likeCount={post.likeCount || 0}
                               isAuthenticated={isAuthenticated}
                             />

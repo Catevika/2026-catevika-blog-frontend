@@ -89,7 +89,7 @@ const PostView = () => {
               <LikeButton
                 postAuthorId={post?.author?.id}
                 postId={postId}
-                liked={post.liked || false}
+                likedBy={post.likedBy || []}
                 likeCount={post.likeCount || 0}
                 isAuthenticated={isAuthenticated}
               />

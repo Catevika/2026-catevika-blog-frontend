@@ -14,13 +14,14 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import type {
   GetPostsParams,
-  LikePostResponse,
+  LikeResponse,
   PaginatedPost,
   PostsResponse,
   SerializedPost,
 } from "@/types/index.js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-// Type guard: narrow PostsResponse -> PaginatedPost
+
+// Type guard
 function assertPaginatedPost(
   value: PostsResponse,
 ): asserts value is PaginatedPost {
@@ -40,7 +41,7 @@ function assertPaginatedPost(
 }
 
 /* -------------------------------------------------------
-   PAGINATED PUBLISHED POSTS (PUBLIC)
+   PAGINATED PUBLISHED POSTS
 ------------------------------------------------------- */
 export const usePublishedPostsQuery = (params: GetPostsParams = {}) => {
   const queryClient = useQueryClient();
@@ -53,7 +54,7 @@ export const usePublishedPostsQuery = (params: GetPostsParams = {}) => {
       assertPaginatedPost(data);
 
       if (data.pagination.hasNextPage) {
-        void queryClient.prefetchQuery({
+        await queryClient.prefetchQuery({
           queryKey: ["publishedPosts", { page: page + 1, limit, search }],
           queryFn: () => getPublishedPosts({ page: page + 1, limit, search }),
         });
@@ -67,8 +68,7 @@ export const usePublishedPostsQuery = (params: GetPostsParams = {}) => {
 };
 
 /* -------------------------------------------------------
-   PAGINATED FEED POSTS (PUBLIC)
-   Backend route: GET /api/posts/feed
+   PAGINATED FEED POSTS
 ------------------------------------------------------- */
 export const useFeedPostsQuery = (params: GetPostsParams = {}) => {
   const queryClient = useQueryClient();
@@ -81,7 +81,7 @@ export const useFeedPostsQuery = (params: GetPostsParams = {}) => {
       assertPaginatedPost(data);
 
       if (data.pagination.hasNextPage) {
-        void queryClient.prefetchQuery({
+        await queryClient.prefetchQuery({
           queryKey: ["feedPosts", { page: page + 1, limit, search }],
           queryFn: () => getFeedPosts({ page: page + 1, limit, search }),
         });
@@ -95,8 +95,7 @@ export const useFeedPostsQuery = (params: GetPostsParams = {}) => {
 };
 
 /* -------------------------------------------------------
-   PAGINATED IN-PROGRESS POSTS (AUTH ONLY)
-   (status = draft, author = current user, deleted = false)
+   PAGINATED IN-PROGRESS POSTS
 ------------------------------------------------------- */
 export const useInProgressPostsQuery = (
   params: GetPostsParams & { author?: string } = {},
@@ -106,7 +105,6 @@ export const useInProgressPostsQuery = (
 
   return useQuery<PaginatedPost, Error>({
     queryKey: ["inProgressPosts", { page, limit, search, author }],
-    enabled: true,
     queryFn: async () => {
       const data = await getPosts({
         page,
@@ -120,7 +118,7 @@ export const useInProgressPostsQuery = (
       assertPaginatedPost(data);
 
       if (data.pagination.hasNextPage) {
-        void queryClient.prefetchQuery({
+        await queryClient.prefetchQuery({
           queryKey: [
             "inProgressPosts",
             { page: page + 1, limit, search, author },
@@ -139,13 +137,12 @@ export const useInProgressPostsQuery = (
 
       return data;
     },
-    placeholderData: undefined, // prevents showing stale Published posts
+    placeholderData: undefined,
   });
 };
 
 /* -------------------------------------------------------
-   PAGINATED TRASHED POSTS (AUTH ONLY)
-   Uses dedicated trash route
+   PAGINATED TRASHED POSTS
 ------------------------------------------------------- */
 export const useTrashedPostsQuery = ({
   page = 1,
@@ -194,10 +191,7 @@ export const useUpdatePostMutation = () => {
   >({
     mutationFn: updatePost,
     onSuccess: async (updatedPost) => {
-      queryClient.setQueriesData(
-        { queryKey: ["post", updatedPost.id] },
-        updatedPost,
-      );
+      queryClient.setQueryData(["post", updatedPost.id], updatedPost);
 
       await queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
       await queryClient.invalidateQueries({ queryKey: ["inProgressPosts"] });
@@ -237,52 +231,45 @@ export const useLikePostMutation = () => {
   const userId = useAuthStore((s) => s.user?.id);
 
   return useMutation<
-    LikePostResponse,
+    LikeResponse,
     Error,
     { postId: string },
     { previousPost?: SerializedPost }
   >({
     mutationFn: async ({ postId }) => {
       if (!userId) throw new Error("Must be logged in to like");
-      return likePost(postId, userId);
+      return likePost(postId, userId) as Promise<LikeResponse>;
     },
 
     onMutate: async ({ postId }) => {
       if (!userId) return {};
 
-      await queryClient.cancelQueries({ queryKey: ["post", postId, userId] });
+      await queryClient.cancelQueries({ queryKey: ["post", postId] });
 
       const previousPost = queryClient.getQueryData<SerializedPost>([
         "post",
         postId,
-        userId,
       ]);
 
-      // Optimistic update for the post detail
-      queryClient.setQueryData<SerializedPost>(
-        ["post", postId, userId],
-        (old) => {
-          if (!old) return old;
+      // Optimistic update for single post
+      queryClient.setQueryData<SerializedPost>(["post", postId], (old) => {
+        if (!old) return old;
 
-          const isLiked = old.likedBy.includes(userId);
+        const isLiked = old.likedBy.includes(userId);
+        const newLikedBy = isLiked
+          ? old.likedBy.filter((id) => id !== userId)
+          : [...old.likedBy, userId];
 
-          return {
-            ...old,
-            liked: !isLiked,
-            likeCount: isLiked ? old.likeCount - 1 : old.likeCount + 1,
-            likedBy: isLiked
-              ? old.likedBy.filter((id) => id !== userId)
-              : [...old.likedBy, userId],
-          };
-        },
-      );
+        return {
+          ...old,
+          likedBy: newLikedBy,
+          likeCount: newLikedBy.length,
+        };
+      });
 
-      // Optimistic update for all post lists
+      // Optimistic update for lists
       const updateList = (key: readonly unknown[]) => {
-        queryClient.setQueryData<{
-          docs: SerializedPost[];
-          pagination: PaginatedPost;
-        }>(key, (old) => {
+        queryClient.setQueryData<PaginatedPost>(key, (old) => {
           if (!old) return old;
 
           return {
@@ -291,11 +278,12 @@ export const useLikePostMutation = () => {
               p.id === postId
                 ? {
                     ...p,
-                    liked: !p.liked,
-                    likeCount: p.liked ? p.likeCount - 1 : p.likeCount + 1,
-                    likedBy: p.liked
+                    likedBy: p.likedBy.includes(userId)
                       ? p.likedBy.filter((id) => id !== userId)
                       : [...p.likedBy, userId],
+                    likeCount: p.likedBy.includes(userId)
+                      ? p.likeCount - 1
+                      : p.likeCount + 1,
                   }
                 : p,
             ),
@@ -303,36 +291,32 @@ export const useLikePostMutation = () => {
         });
       };
 
-      updateList(["posts"]);
       updateList(["publishedPosts"]);
+      updateList(["feedPosts"]);
+      updateList(["inProgressPosts"]);
 
       return { previousPost };
     },
 
     onError: (_err, { postId }, ctx) => {
       if (ctx?.previousPost) {
-        queryClient.setQueryData(["post", postId, userId], ctx.previousPost);
+        queryClient.setQueryData(["post", postId], ctx.previousPost);
       }
     },
 
-    onSuccess: (data, { postId }) => {
-      // Reconcile with server
-      queryClient.setQueryData<SerializedPost>(
-        ["post", postId, userId],
-        (old) =>
-          old
-            ? {
-                ...old,
-                liked: data.liked,
-                likeCount: data.likeCount,
-                likedBy: data.likedBy,
-              }
-            : old,
+    onSuccess: async (data, { postId }) => {
+      queryClient.setQueryData<SerializedPost>(["post", postId], (old) =>
+        old
+          ? {
+              ...old,
+              likedBy: data.likedBy,
+              likeCount: data.likeCount,
+            }
+          : old,
       );
 
-      // Keep lists fresh
-      void queryClient.invalidateQueries({ queryKey: ["posts"] });
-      void queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
+      await queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
+      await queryClient.invalidateQueries({ queryKey: ["feedPosts"] });
     },
   });
 };
@@ -347,7 +331,7 @@ export const useFavoritesPosts = () => {
 
 export const useSinglePostQuery = (postId: string, userId?: string) => {
   return useQuery<SerializedPost | undefined, Error>({
-    queryKey: ["post", postId, userId],
+    queryKey: ["post", postId],
     queryFn: () => getPost(postId, userId),
     enabled: !!postId,
   });

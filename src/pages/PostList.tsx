@@ -181,10 +181,9 @@ export default function PostList() {
   const handleRestore = useCallback(
     async (id: string) => {
       await restoreMutation.mutateAsync(id);
-      // invalidateQueries returns a Promise; use void to explicitly ignore it
-      void queryClient.invalidateQueries({ queryKey: ["trashPosts"] });
-      void queryClient.invalidateQueries({ queryKey: ["inProgressPosts"] });
-      void queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
+      await queryClient.invalidateQueries({ queryKey: ["trashPosts"] });
+      await queryClient.invalidateQueries({ queryKey: ["inProgressPosts"] });
+      await queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
     },
     [restoreMutation, queryClient],
   );

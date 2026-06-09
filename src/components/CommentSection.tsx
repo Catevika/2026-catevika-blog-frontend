@@ -27,7 +27,7 @@ const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
   const isLoggedIn = !!user;
   const isPostAuthor = userId === postAuthorId;
 
-  const createCommentMutation = useCreateComment(postId);
+  const createCommentMutation = useCreateComment(postId, userId);
 
   const {
     data: comments,
@@ -35,9 +35,8 @@ const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
     isError,
     error,
     refetch,
-    isFetching,
   } = useQuery<SerializedComment[], FetchError>({
-    queryKey: ["comments", postId],
+    queryKey: ["comments", postId, userId],
     queryFn: () => getCommentsTree(postId, userId),
     staleTime: 5 * 60 * 1000,
   });
@@ -67,11 +66,7 @@ const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
         </div>
       )}
 
-      <CommentsHeader
-        totalComments={totalComments}
-        isFetching={isFetching}
-        onRefresh={() => void refetch()}
-      />
+      <CommentsHeader totalComments={totalComments} />
 
       {isError && (
         <CommentsErrorBoundary error={error} onRetry={() => void refetch()} />
