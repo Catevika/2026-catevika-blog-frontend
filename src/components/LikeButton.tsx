@@ -7,52 +7,50 @@ import { BsChatSquareHeart } from "react-icons/bs";
 
 const LikeButton = ({
   postId,
-  liked,
+  likedBy,
   likeCount,
   isAuthenticated,
   postAuthorId,
 }: LikeButtonProps) => {
   const user = useAuthStore((s) => s.user);
+  const userId = user?.id ?? "";
   const { mutate, isPending } = useLikePostMutation();
 
-  const isOwner = user?.id === postAuthorId;
+  const isOwner = userId === postAuthorId;
+
+  const youLiked = likedBy.includes(userId);
+  const othersLiked = likedBy.filter((id) => id !== userId).length > 0;
+
   const isDisabled = !isAuthenticated || isPending || isOwner;
 
   const handleLike = () => {
-    if (isOwner) return;
+    if (isDisabled) return;
     mutate({ postId });
   };
+
+  let icon;
+
+  if (isOwner) {
+    icon = othersLiked ? <BsChatSquareHeart /> : <AiOutlineHeart />;
+  } else if (youLiked) {
+    icon = <AiFillHeart />;
+  } else if (othersLiked) {
+    icon = <BsChatSquareHeart />;
+  } else {
+    icon = <AiOutlineHeart />;
+  }
 
   return (
     <div className="flex items-center gap-2">
       <Button
         variant="default"
-        title={
-          !isAuthenticated
-            ? "Log in to like"
-            : isOwner
-              ? "Cannot like your own post"
-              : ""
-        }
         onClick={handleLike}
         disabled={isDisabled}
         className="flex items-center rounded-md py-1 px-2 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-100!"
-        aria-label={
-          isOwner
-            ? "Cannot like your own post"
-            : liked
-              ? "Unlike post"
-              : "Like post"
-        }
       >
-        {isOwner ? (
-          <BsChatSquareHeart />
-        ) : liked ? (
-          <AiFillHeart />
-        ) : (
-          <AiOutlineHeart />
-        )}
+        {icon}
       </Button>
+
       <p className="font-semibold">{likeCount}</p>
     </div>
   );

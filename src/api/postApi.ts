@@ -2,7 +2,7 @@ import { ApiError } from "@/errors/ApiError";
 import type {
   GetPostsFilters,
   GetPostsParams,
-  LikePostResponse,
+  LikeResponse,
   PostsResponse,
   SerializedPost,
 } from "@/types/index.js";
@@ -206,7 +206,7 @@ export async function restorePost(id: string): Promise<SerializedPost> {
 export const likePost = async (
   postId: string,
   userId?: string,
-): Promise<LikePostResponse> => {
+): Promise<LikeResponse> => {
   const res = await fetch(`/api/posts/${encodeURIComponent(postId)}/like`, {
     method: "POST",
     headers: {
@@ -220,7 +220,7 @@ export const likePost = async (
     throw new Error("Failed to toggle like");
   }
 
-  return (await res.json()) as LikePostResponse;
+  return (await res.json()) as LikeResponse;
 };
 
 // Fetch favorite posts
