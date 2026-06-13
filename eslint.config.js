@@ -9,6 +9,7 @@ export default defineConfig([
   globalIgnores(["node_modules", "dist", "coverage"]),
   {
     files: ["**/*.{ts,tsx}"],
+    ignores: ["src/components/ui/**"],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommendedTypeChecked,
