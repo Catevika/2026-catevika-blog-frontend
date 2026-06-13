@@ -16,12 +16,21 @@ export default function Dashboard() {
   return (
     <section className="relative w-auto h-auto max-w-2xl mx-auto max-h-120 grow">
       <figure className="flex flex-col items-center justify-center">
-        <img
-          src="assets/windows-11-bloom-light-variants-v1.png"
-          alt=""
-          aria-hidden="true"
-          className="object-center rounded-2xl"
-        />
+        <picture>
+          <source
+            srcSet="assets/windows-11-bloom-light-variants-v1.webp"
+            type="image/webp"
+          />
+          <img
+            src="assets/windows-11-bloom-light-variants-v1.png"
+            alt="Hero banner"
+            width="960"
+            height="600"
+            aria-hidden="true"
+            className="object-center rounded-2xl"
+            loading="lazy"
+          />
+        </picture>
         <figcaption className="text-xs text-center">
           <Link
             rel="noopener noreferrer"

@@ -22,9 +22,9 @@ export default function ThemeButton() {
         aria-pressed={theme === "dark"}
       >
         {theme === "dark" ? (
-          <PiMoon aria-hidden="true" size={24} className="font-semibold" />
-        ) : (
           <PiSun aria-hidden="true" size={24} className="font-semibold" />
+        ) : (
+          <PiMoon aria-hidden="true" size={24} className="font-semibold" />
         )}
         <span className="sr-only">
           {theme === "dark" ? "Dark mode active" : "Light mode active"}
