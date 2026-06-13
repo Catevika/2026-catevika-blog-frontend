@@ -70,7 +70,7 @@ export default function PostExport() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <p>Loading post...</p>
       </div>
     );
@@ -78,7 +78,7 @@ export default function PostExport() {
 
   if (error || !post) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-red-500">{error ?? "Post not found"}</p>
       </div>
     );
@@ -87,12 +87,12 @@ export default function PostExport() {
   return (
     <div
       id="post-export"
-      className="container mx-auto py-8 px-4 bg-background text-foreground"
+      className="bg-background text-foreground container mx-auto px-4 py-8"
     >
       <Card className="w-full">
         <CardHeader>
           <h1 className="text-3xl font-bold">{post.title}</h1>
-          <div className="mt-4 text-sm text-muted-foreground">
+          <div className="text-muted-foreground mt-4 text-sm">
             <AuthorForPost post={post} />
             {post.createdAt && (
               <p>Published: {formatDate(new Date(post.createdAt))}</p>

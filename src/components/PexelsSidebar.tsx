@@ -282,7 +282,7 @@ const PexelsSidebar = ({ onInsert }: PexelsSidebarProps) => {
 
       {/* Footer */}
       <footer className="shrink-0 pt-1">
-        <p className="text-sm text-center">
+        <p className="text-center text-sm">
           Photos provided by{" "}
           <Link
             to="https://www.pexels.com"

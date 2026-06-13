@@ -55,14 +55,7 @@ function CommentNode({
       {/* Animated nested replies */}
       <div
         data-state={expanded ? "open" : "closed"}
-        className={`
-          ml-4 border-l pl-4
-          overflow-hidden
-          transition-all
-          duration-200
-          data-[state=open]:animate-accordion-down
-          data-[state=closed]:animate-accordion-up
-        `}
+        className={`data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up ml-4 overflow-hidden border-l pl-4 transition-all duration-200`}
       >
         {expanded &&
           comment.replies?.map((reply) => (

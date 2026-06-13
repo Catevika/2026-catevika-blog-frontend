@@ -22,7 +22,7 @@ export default function LogOutButton() {
       <button
         type="button"
         onClick={() => void onLogout()}
-        className="duration-200 hover:opacity-70 transition-opacity cursor-pointer border-transparent! bg-transparent! p-2 font-medium hover:bg-transparent! hidden md:inline"
+        className="hidden cursor-pointer border-transparent! bg-transparent! p-2 font-medium transition-opacity duration-200 hover:bg-transparent! hover:opacity-70 md:inline"
         title="Log out and go to login page"
         aria-label="Go to login page"
       >
@@ -33,7 +33,7 @@ export default function LogOutButton() {
       <button
         type="button"
         onClick={() => void onLogout()}
-        className="duration-200 hover:opacity-70 transition-opacity cursor-pointer border-transparent! bg-transparent! p-2 font-medium hover:bg-transparent! inline md:hidden"
+        className="inline cursor-pointer border-transparent! bg-transparent! p-2 font-medium transition-opacity duration-200 hover:bg-transparent! hover:opacity-70 md:hidden"
         title="Log out and go to login page"
         aria-label="Go to login page"
       >

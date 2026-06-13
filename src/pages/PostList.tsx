@@ -193,8 +193,8 @@ export default function PostList() {
   ------------------------- */
 
   return (
-    <section className="flex flex-col items-center w-full">
-      <div className="flex flex-col items-center justify-between w-full pb-2 sm:pb-0 sm:flex-row sm:justify-between">
+    <section className="flex w-full flex-col items-center">
+      <div className="flex w-full flex-col items-center justify-between pb-2 sm:flex-row sm:justify-between sm:pb-0">
         <TypographyH1>Posts</TypographyH1>
 
         <div className="flex flex-wrap gap-2">
@@ -218,7 +218,7 @@ export default function PostList() {
       </InputGroup>
 
       {/* Published block */}
-      <Badge className="px-3 mt-4 text-base h-7">Published</Badge>
+      <Badge className="mt-4 h-7 px-3 text-base">Published</Badge>
 
       {publishedPagination && publishedPagination.totalPages > 1 && (
         <PostsPagination
@@ -250,7 +250,7 @@ export default function PostList() {
       {/* In progress (author only) */}
       {user && (
         <>
-          <Badge className="px-3 mt-4 text-base h-7">In Progress</Badge>
+          <Badge className="mt-4 h-7 px-3 text-base">In Progress</Badge>
 
           {inProgressPagination && inProgressPagination.totalPages > 1 ? (
             <PostsPagination
@@ -286,7 +286,7 @@ export default function PostList() {
       {/* Restore from bin (author only) */}
       {user && (
         <>
-          <Badge className="px-3 mt-4 text-base h-7">Restore from Bin</Badge>
+          <Badge className="mt-4 h-7 px-3 text-base">Restore from Bin</Badge>
 
           {trashedPagination && trashedPagination.totalPages > 1 && (
             <PostsPagination

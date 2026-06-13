@@ -6,7 +6,7 @@ const CommentsHeader = ({ totalComments }: CommentsHeaderProps) => {
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <TypographyH2>Comments</TypographyH2>
-        <span aria-live="polite" className="pb-1 text-sm text-muted-foreground">
+        <span aria-live="polite" className="text-muted-foreground pb-1 text-sm">
           ({totalComments})
         </span>
       </div>

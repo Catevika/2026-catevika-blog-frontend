@@ -38,7 +38,7 @@ const CustomPdfButton = ({ postId, postTitle }: CustomPdfButtonProps) => {
 
       {/* PDF Error Display - renders only when error exists */}
       {pdfError && (
-        <div className="flex flex-col items-center justify-between mb-4 form-error">
+        <div className="form-error mb-4 flex flex-col items-center justify-between">
           <span>{pdfError}</span>
           <button
             type="button"

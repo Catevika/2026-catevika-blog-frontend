@@ -90,7 +90,7 @@ const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
               <CardTitle>Join the conversation</CardTitle>
             </CardHeader>
             <CardContent className="text-center text-lg">
-              <Link to="/auth" className="hover:underline mt-2 sm:mt-0">
+              <Link to="/auth" className="mt-2 hover:underline sm:mt-0">
                 <em>Log in</em>
               </Link>{" "}
               to share your thoughts and engage with the community.

@@ -80,9 +80,9 @@ const PostView = () => {
   return (
     <section id="post-view" className="sm:p-8">
       <header>
-        <div className="flex flex-col items-center justify-between w-full pb-2 sm:pb-0 sm:flex-row sm:justify-between">
+        <div className="flex w-full flex-col items-center justify-between pb-2 sm:flex-row sm:justify-between sm:pb-0">
           <div className="flex items-center space-x-4">
-            <Badge className="px-3 text-base h-7">
+            <Badge className="h-7 px-3 text-base">
               {post.status === "draft" ? "Draft" : "Published"}
             </Badge>
             {post.status === "published" ? (
@@ -99,15 +99,15 @@ const PostView = () => {
             <CustomPdfButton postId={postId} postTitle={post.title} />
           </div>
           {!user ? (
-            <Link to="/auth" className="text-sm hover:underline mt-2 sm:mt-0">
+            <Link to="/auth" className="mt-2 text-sm hover:underline sm:mt-0">
               <em>Log in to edit, like or comment this post</em>
             </Link>
           ) : null}
-          <div className="flex items-center flex-wrap gap-2 mt-2 sm:mt-0">
+          <div className="mt-2 flex flex-wrap items-center gap-2 sm:mt-0">
             <CustomFeedButton />
             <CustomTrendingButton />
             <CustomPublishedButton />
-            <span className="flex items-center flex-nowrap gap-2">
+            <span className="flex flex-nowrap items-center gap-2">
               <CustomNewButton />
               {user ? <CustomEditLink post={post} user={user} /> : null}
               {isAuthor ? (

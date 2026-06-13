@@ -206,7 +206,7 @@ const PostEdit = () => {
 
   return (
     <section id="post-create-edit">
-      <div className="pb-2 flex-col-center md:flex-row md:flex-nowrap md:justify-between">
+      <div className="flex-col-center pb-2 md:flex-row md:flex-nowrap md:justify-between">
         <PostEditHeader isNew={isNew} status={draft.status} />
 
         <div className="flex gap-2">

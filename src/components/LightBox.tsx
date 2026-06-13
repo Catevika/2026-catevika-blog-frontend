@@ -113,7 +113,7 @@ const LightBox = ({ enlargedPhoto, handleCloseEnlarge }: LightBoxProps) => {
           ref={closeButtonRef}
           type="button"
           onClick={handleCloseEnlarge}
-          className="absolute top-2 right-2 text-background"
+          className="text-background absolute top-2 right-2"
           aria-label="Close enlarged photo"
         />
 

@@ -69,7 +69,7 @@ export function Pagination({
           <FiChevronRight />
         </Button>
       </span>
-      <span className="text-xs text-muted-foreground flex items-center justify-center gap-4 pt-1">
+      <span className="text-muted-foreground flex items-center justify-center gap-4 pt-1 text-xs">
         <em>{maxInfo}</em>
       </span>
     </nav>

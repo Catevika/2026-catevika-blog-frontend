@@ -43,9 +43,9 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <Card className="w-full mx-auto mt-10 max-w-2/3 md:max-w-1/3">
+    <Card className="mx-auto mt-10 w-full max-w-2/3 md:max-w-1/3">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center">
+        <CardTitle className="text-center text-2xl font-bold">
           {mode === "signup" ? "Create an account" : "Login"}
         </CardTitle>
         <CardDescription className="text-center">
@@ -67,7 +67,7 @@ export default function Auth() {
           method="post"
         >
           {globalError && (
-            <p className="text-sm text-center text-red-500">{globalError}</p>
+            <p className="text-center text-sm text-red-500">{globalError}</p>
           )}
 
           {mode === "signup" && (
@@ -131,7 +131,7 @@ export default function Auth() {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute -translate-y-1/2 right-2 top-1/2 text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
               >
                 {showPassword ? (
                   <VscEyeClosed size={18} />
@@ -162,7 +162,7 @@ export default function Auth() {
         </form>
       </CardContent>
       {cooldown !== null && (
-        <p className="mt-2 text-sm text-center text-red-500">
+        <p className="mt-2 text-center text-sm text-red-500">
           Try again in {formatCooldown(cooldown)}.
         </p>
       )}

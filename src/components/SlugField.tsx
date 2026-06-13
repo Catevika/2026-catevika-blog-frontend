@@ -75,7 +75,7 @@ const SlugField: React.FC<SlugFieldProps> = ({
     <Field className="post-create-edit-title-group">
       <FieldLabel htmlFor={slugId}>Slug *</FieldLabel>
 
-      <div className="flex flex-col md:flex-row gap-2 items-center justify-between">
+      <div className="flex flex-col items-center justify-between gap-2 md:flex-row">
         <InputGroup>
           <InputGroupInput
             ref={inputRef}
@@ -106,14 +106,14 @@ const SlugField: React.FC<SlugFieldProps> = ({
           disabled={disabled}
           className="w-42 whitespace-nowrap"
         >
-          <LuRotateCcw size={16} className="inline-block mr-1" />
+          <LuRotateCcw size={16} className="mr-1 inline-block" />
           Reset
         </Button>
       </div>
 
       <div
         id={helpId}
-        className="text-sm mt-1 min-h-12 flex flex-col justify-start"
+        className="mt-1 flex min-h-12 flex-col justify-start text-sm"
         aria-live="polite"
       >
         <div className="flex items-center gap-1 text-xs">
@@ -132,7 +132,7 @@ const SlugField: React.FC<SlugFieldProps> = ({
 
         {/* show suggestion whenever suggestion exists */}
         {!loading && suggestion && (
-          <div className="text-red-600 flex items-center gap-1">
+          <div className="flex items-center gap-1 text-red-600">
             <span>⚠️</span>
             <span>
               Slug taken — suggestion:{" "}
@@ -160,7 +160,7 @@ const SlugField: React.FC<SlugFieldProps> = ({
         )}
 
         {!loading && availError && (
-          <div className="text-red-600 flex items-center gap-1">
+          <div className="flex items-center gap-1 text-red-600">
             <span>⚠️</span>
             <span>Check failed: {availError}</span>
           </div>

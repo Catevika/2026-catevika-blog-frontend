@@ -12,7 +12,7 @@ const CommentFormSection = ({
       <CardHeader className="flex items-center gap-2">
         <CardTitle>Leave a comment</CardTitle>
         {isPostAuthor && (
-          <Badge className="px-3 text-base h-7">Post Author</Badge>
+          <Badge className="h-7 px-3 text-base">Post Author</Badge>
         )}
       </CardHeader>
       <CommentForm

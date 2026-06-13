@@ -18,7 +18,7 @@ const CustomEditLink = ({
       className={
         userId && post?.author?.id === userId
           ? ""
-          : "text-transparent cursor-default pointer-events-none"
+          : "pointer-events-none cursor-default text-transparent"
       }
     >
       <TfiPencil style={{ height: 20, width: 20 }} />

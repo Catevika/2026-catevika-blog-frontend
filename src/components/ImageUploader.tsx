@@ -185,7 +185,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
             <img src={preview} alt="Preview" loading="lazy" />
           </button>
 
-          <div className="flex justify-between py-0 px-1 mb-1">
+          <div className="mb-1 flex justify-between px-1 py-0">
             <Button type="button" variant="destructive" onClick={reset}>
               Reset
             </Button>
@@ -199,7 +199,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       ) : (
         <button
           type="button"
-          className="flex flex-col gap-1 hover:border-primary h-40 w-full cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 p-2"
+          className="hover:border-primary flex h-40 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed border-gray-300 p-2"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={() => fileInputRef.current?.click()}

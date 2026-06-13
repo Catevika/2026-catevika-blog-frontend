@@ -64,7 +64,7 @@ export default function CommentItem({
   ------------------------------------------------------- */
   if (comment.deleted) {
     if (comment.replies && comment.replies.length > 0) {
-      return <div className="py-2 text-muted-foreground italic">[deleted]</div>;
+      return <div className="text-muted-foreground py-2 italic">[deleted]</div>;
     }
     return null;
   }
@@ -106,7 +106,7 @@ export default function CommentItem({
         {/* Header */}
         <header className="flex-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary">
+            <div className="bg-primary flex h-10 w-10 items-center justify-center rounded-full">
               <span className="font-semibold">
                 {comment.author.name.charAt(0).toUpperCase()}
               </span>
@@ -120,14 +120,14 @@ export default function CommentItem({
 
         {/* Reply context */}
         {parent && (
-          <div className="text-xs text-muted-foreground mb-2">
+          <div className="text-muted-foreground mb-2 text-xs">
             ↳ Replying to{" "}
             <span className="font-medium">{parent.author.name}</span>
           </div>
         )}
 
         {/* Content */}
-        <div className="mb-6 max-w-none text-md leading-relaxed">
+        <div className="text-md mb-6 max-w-none leading-relaxed">
           {comment.content}
         </div>
 

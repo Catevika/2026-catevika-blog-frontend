@@ -19,16 +19,16 @@ export default function NavBar() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 px-2 pt-2 mx-auto md:px-4 bg-card/50 z-100 backdrop-blur-md shrink-0"
+      className="bg-card/50 fixed top-0 right-0 left-0 z-100 mx-auto shrink-0 px-2 pt-2 backdrop-blur-md md:px-4"
       aria-label="Main navigation"
     >
-      <div className="flex items-center justify-between max-w-5xl mx-auto">
+      <div className="mx-auto flex max-w-5xl items-center justify-between">
         <CatevikaLogo />
 
         <NavigationMenu className="hidden w-57 sm:block">
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="font-semibold text-md/relaxed">
+              <NavigationMenuTrigger className="text-md/relaxed font-semibold">
                 Menu
               </NavigationMenuTrigger>
               <NavigationMenuContent>

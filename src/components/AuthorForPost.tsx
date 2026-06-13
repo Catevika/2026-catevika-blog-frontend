@@ -4,7 +4,7 @@ import { Link } from "react-router";
 
 const AuthorForPost = ({ post }: { post: SerializedPost }) => {
   return (
-    <div id="author" className="flex-col my-4 text-sm">
+    <div id="author" className="my-4 flex-col text-sm">
       <Link to={`/posts/${post.id}`} className="font-bold hover:underline">
         {post.title}
       </Link>

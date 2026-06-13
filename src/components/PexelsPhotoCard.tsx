@@ -48,7 +48,7 @@ const PexelsPhotoCard = ({
       </Button>
 
       {/* Footer with photographer + insert button */}
-      <div className="flex justify-between items-center pt-0 p-1">
+      <div className="flex items-center justify-between p-1 pt-0">
         <span className="truncate">{photographerName}</span>
         <Button
           type="button"

@@ -16,7 +16,7 @@ export default function ThemeButton() {
 
       <button
         onClick={handleToggle}
-        className="duration-200 hover:opacity-70 transition-opacity border-transparent! bg-transparent! p-2 hover:bg-transparent!"
+        className="border-transparent! bg-transparent! p-2 transition-opacity duration-200 hover:bg-transparent! hover:opacity-70"
         title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
         aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
         aria-pressed={theme === "dark"}

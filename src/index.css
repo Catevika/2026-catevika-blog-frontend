@@ -32,8 +32,7 @@
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
-    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
   --sans: Inter, system-ui, sans-serif;
   --heading: Inter, system-ui, sans-serif;
@@ -149,8 +148,7 @@
     --accent-border: rgba(192, 132, 252, 0.5);
     --social-bg: rgba(47, 48, 58, 0.5);
     --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px,
-      rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
 }
 
@@ -232,7 +230,7 @@ code {
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'Inter Variable', sans-serif;
+  --font-sans: "Inter Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -309,7 +307,7 @@ code {
 
 @layer base {
   html {
-    @apply font-sans overflow-x-hidden overflow-y-scroll scroll-smooth;
+    @apply overflow-x-hidden overflow-y-scroll scroll-smooth font-sans;
   }
 
   body {
@@ -341,9 +339,9 @@ code {
 
     /* Hide scrollbar for Chrome, Safari and Opera */
     & ::-webkit-scrollbar {
-    display: none;
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+      display: none;
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
     }
   }
 
@@ -353,7 +351,8 @@ code {
   }
 
   /* replace the editor text color for code - light mode */
-  .light p code, .light code .code-line {
+  .light p code,
+  .light code .code-line {
     color: #16171d !important;
   }
 
@@ -363,7 +362,7 @@ code {
       display: flex !important;
       flex-direction: row !important;
     }
-    
+
     & .md-editor-columns .w-md-editor-content {
       display: flex !important;
       flex-direction: row !important;
@@ -378,7 +377,7 @@ code {
 
     /* center image and caption */
     & div > img + p {
-      @apply flex justify-center items-center w-full gap-2;
+      @apply flex w-full items-center justify-center gap-2;
     }
   }
 
@@ -386,7 +385,7 @@ code {
     @apply flex flex-col;
 
     .post-create-edit-main-title {
-      @apply flex flex-col justify-center  md:flex-row md:flex-nowrap md:justify-between;
+      @apply flex flex-col justify-center md:flex-row md:flex-nowrap md:justify-between;
     }
 
     .post-create-edit-container {
@@ -410,11 +409,11 @@ code {
     }
 
     .post-create-edit-status-group {
-      @apply order-1 md:order-2 flex flex-wrap gap-1 w-42;
+      @apply order-1 flex w-42 flex-wrap gap-1 md:order-2;
     }
 
     .post-create-edit-status {
-      @apply py-4 md:py-0 w-md;
+      @apply w-md py-4 md:py-0;
     }
 
     .mdEditor-form {
@@ -514,9 +513,9 @@ code {
     }
 
     .photo-card {
-      @apply shrink-0 overflow-hidden rounded-md border lg:flex-1 lg:cursor-grab text-sm;
+      @apply shrink-0 overflow-hidden rounded-md border text-sm lg:flex-1 lg:cursor-grab;
     }
-  
+
     .photo-card-image {
       @apply relative aspect-video min-h-40 w-full overflow-hidden;
       & img {
@@ -532,7 +531,7 @@ code {
       }
 
       & .lightbox-image {
-        @apply max-h-[80vh] max-w-[80vw] object-contain rounded-md;
+        @apply max-h-[80vh] max-w-[80vw] rounded-md object-contain;
       }
 
       & .lightbox-author {
@@ -552,7 +551,7 @@ code {
       @apply relative flex-1 overflow-x-hidden overflow-y-scroll rounded border p-0;
     }
 
-    & .w-md-editor-text-pre, 
+    & .w-md-editor-text-pre,
     .w-md-editor-text-pre .code-highlight {
       background-color: transparent !important;
     }
@@ -574,19 +573,34 @@ code {
     page-break-inside: avoid;
     break-inside: avoid;
 
-    & h1 , h2 , h3 , h4 , h5 , h6 {
+    & h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
       break-after: avoid;
       page-break-after: avoid;
     }
 
-    & h1 + *, h2 + *, h3 + *, h4 + *, h5 + *, h6 + * {
+    & h1 + *,
+    h2 + *,
+    h3 + *,
+    h4 + *,
+    h5 + *,
+    h6 + * {
       break-before: avoid;
       page-break-before: avoid;
       break-inside: avoid;
       page-break-inside: avoid;
     }
 
-    & h1 + * + *, h2 + * + *, h3 + * + *, h4 + * + *, h5 + * + *, h6 + * + * {
+    & h1 + * + *,
+    h2 + * + *,
+    h3 + * + *,
+    h4 + * + *,
+    h5 + * + *,
+    h6 + * + * {
       break-inside: avoid;
     }
 
@@ -597,7 +611,8 @@ code {
       content-visibility: visible !important;
     }
 
-    & div:not(div > pre > *), div:not(table > *),
+    & div:not(div > pre > *),
+    div:not(table > *),
     #post-content.dark > *,
     .wmde-markdown.wmde-markdown-color > * {
       --foreground: oklch(0.141 0.005 285.823);

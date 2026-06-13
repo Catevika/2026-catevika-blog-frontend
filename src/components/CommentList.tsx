@@ -55,13 +55,7 @@ function MobileCommentNode({
       {/* Animated replies */}
       <div
         data-state={expanded ? "open" : "closed"}
-        className={`
-          overflow-hidden
-          transition-all
-          duration-200
-          data-[state=open]:animate-accordion-down
-          data-[state=closed]:animate-accordion-up
-        `}
+        className={`data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden transition-all duration-200`}
       >
         {expanded &&
           comment.replies?.map((reply) => (

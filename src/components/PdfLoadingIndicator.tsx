@@ -33,7 +33,7 @@ export const PdfLoadingIndicator = ({
         <div className="flex items-center gap-2">
           {/* Animated spinner */}
           <svg
-            className="animate-spin h-5 w-5"
+            className="h-5 w-5 animate-spin"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

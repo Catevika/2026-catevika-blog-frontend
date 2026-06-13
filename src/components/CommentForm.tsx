@@ -39,9 +39,9 @@ const CommentForm = ({
         placeholder={placeholder}
         rows={parentId ? 2 : 4}
         maxLength={5000}
-        className="w-full mb-0"
+        className="mb-0 w-full"
       />
-      <p className="ml-auto text-sm mt-2">
+      <p className="mt-2 ml-auto text-sm">
         Message length:{" "}
         <span className="text-muted-foreground">{content.length}/5000</span>
       </p>

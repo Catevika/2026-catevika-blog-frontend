@@ -111,8 +111,8 @@ export default function Feed() {
   );
 
   return (
-    <section className="flex flex-col items-center w-full">
-      <div className="flex flex-col items-center justify-between w-full pb-2 sm:pb-0 sm:flex-row sm:justify-between">
+    <section className="flex w-full flex-col items-center">
+      <div className="flex w-full flex-col items-center justify-between pb-2 sm:flex-row sm:justify-between sm:pb-0">
         <TypographyH1>Feed</TypographyH1>
 
         <div className="flex flex-wrap gap-2">
@@ -135,7 +135,7 @@ export default function Feed() {
         </InputGroupAddon>
       </InputGroup>
 
-      <Badge className="px-3 mt-4 text-base h-7 mb-4!">Published</Badge>
+      <Badge className="mt-4 mb-4! h-7 px-3 text-base">Published</Badge>
 
       {/* Pagination */}
       {feedPagination && feedPagination.totalPages > 1 && (
@@ -151,11 +151,7 @@ export default function Feed() {
 
       <div
         data-state={feedQuery.isFetching ? "loading" : "loaded"}
-        className="
-          transition-opacity duration-200
-          data-[state=loading]:opacity-50
-          data-[state=loaded]:opacity-100
-        "
+        className="transition-opacity duration-200 data-[state=loaded]:opacity-100 data-[state=loading]:opacity-50"
       >
         <ul className="flex flex-col gap-4">
           {feedPosts.length > 0 ? (
@@ -163,7 +159,7 @@ export default function Feed() {
               <Card key={post.id} className="p-4">
                 <li>
                   <header>
-                    <div className="flex flex-col items-center gap-2 mb-4 md:flex-row md:flex-nowrap md:justify-between md:gap-0">
+                    <div className="mb-4 flex flex-col items-center gap-2 md:flex-row md:flex-nowrap md:justify-between md:gap-0">
                       <div className="flex gap-4">
                         {post.status === "published" &&
                           post.id &&

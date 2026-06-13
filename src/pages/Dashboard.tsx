@@ -14,7 +14,7 @@ export default function Dashboard() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
-    <section className="relative w-auto h-auto max-w-2xl mx-auto max-h-120 grow">
+    <section className="relative mx-auto h-auto max-h-120 w-auto max-w-2xl grow">
       <figure className="flex flex-col items-center justify-center">
         <picture>
           <source
@@ -27,16 +27,16 @@ export default function Dashboard() {
             width="960"
             height="600"
             aria-hidden="true"
-            className="object-center rounded-2xl"
+            className="rounded-2xl object-center"
             loading="lazy"
           />
         </picture>
-        <figcaption className="text-xs text-center">
+        <figcaption className="text-center text-xs">
           <Link
             rel="noopener noreferrer"
             to="https://www.behance.net/gallery/202329689/Windows-11-Wallpaper-(2022)"
             target="_blank"
-            className="no-underline transition-opacity duration-200 hover:opacity-70 text-muted-foreground"
+            className="text-muted-foreground no-underline transition-opacity duration-200 hover:opacity-70"
           >
             CG Artists: Danny Yoon, Brian Townsend and Ziye Liu -
             Product&nbsp;Designers: Quan Jasinski and Kaeling Gurr -
@@ -44,8 +44,8 @@ export default function Dashboard() {
           </Link>
         </figcaption>
       </figure>
-      <div className="block m-5 sm:absolute sm:inset-0 sm:flex sm:flex-col sm:items-center sm:flex-wrap">
-        <div className="sm:pb-25 dark:text-foreground! dark:sm:text-background!">
+      <div className="m-5 block sm:absolute sm:inset-0 sm:flex sm:flex-col sm:flex-wrap sm:items-center">
+        <div className="dark:text-foreground! dark:sm:text-background! sm:pb-25">
           <TypographyH1>Welcome&nbsp;to&nbsp;my Tech&nbsp;Blog!</TypographyH1>
         </div>
         <Item
@@ -53,7 +53,7 @@ export default function Dashboard() {
           className="sm:bg-background/20 sm:dark:bg-foreground/20 sm:backdrop-blur-md"
         >
           <ItemContent>
-            <ItemHeader className="text-xl font-semibold sm:dark:text-background">
+            <ItemHeader className="sm:dark:text-background text-xl font-semibold">
               Read&nbsp;Ultra&nbsp;Expert&nbsp;Posts!
             </ItemHeader>
           </ItemContent>
@@ -71,18 +71,18 @@ export default function Dashboard() {
           aria-hidden="true"
           role="separator"
         >
-          <div className="z-20 border-primary max-w-[35%] flex-1 grow border" />
-          <span className="z-20 px-4 mx-4 text-xl font-bold text-background dark:text-foreground shrink lg:text-2xl">
+          <div className="border-primary z-20 max-w-[35%] flex-1 grow border" />
+          <span className="text-background dark:text-foreground z-20 mx-4 shrink px-4 text-xl font-bold lg:text-2xl">
             OR
           </span>
-          <div className="z-20 border-primary max-w-[35%] flex-1 grow border" />
+          <div className="border-primary z-20 max-w-[35%] flex-1 grow border" />
         </div>
         <Item
           variant="default"
           className="sm:bg-background/20 sm:dark:bg-foreground/20 sm:backdrop-blur-md"
         >
           <ItemContent>
-            <ItemHeader className="text-xl font-semibold sm:dark:text-background">
+            <ItemHeader className="sm:dark:text-background text-xl font-semibold">
               Write&nbsp;Meaningful&nbsp;Posts!
             </ItemHeader>
           </ItemContent>

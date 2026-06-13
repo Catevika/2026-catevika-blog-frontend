@@ -46,7 +46,7 @@ const LikeButton = ({
         variant="default"
         onClick={handleLike}
         disabled={isDisabled}
-        className="flex items-center rounded-md py-1 px-2 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-100!"
+        className="flex items-center rounded-md px-2 py-1 transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-100!"
       >
         {icon}
       </Button>

@@ -419,7 +419,7 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(
                 onValueChange={(value) => onStatusChange?.(value as PostStatus)}
                 aria-label="Select post status"
               >
-                <SelectTrigger className="w-42 border border-input px-3 focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-ring">
+                <SelectTrigger className="border-input focus-visible:ring-ring w-42 border px-3 focus-visible:ring-2 focus-visible:ring-offset-0">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
