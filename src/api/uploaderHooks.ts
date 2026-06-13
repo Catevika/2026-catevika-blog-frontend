@@ -7,7 +7,7 @@ export const useImageUpload = ({ onSuccess }: UseImageUploadProps = {}) => {
 
   return useMutation<ImageUploadResponse, Error, File>({
     mutationFn: uploaderApi.uploadImage,
-    onSuccess: (data: ImageUploadResponse) => {
+    onSuccess: async (data: ImageUploadResponse) => {
       if (data.success && data.data?.url) {
         const {
           url: imageUrl,
@@ -20,7 +20,7 @@ export const useImageUpload = ({ onSuccess }: UseImageUploadProps = {}) => {
         }
 
         onSuccess?.(imageUrl, fileName);
-        void queryClient.invalidateQueries({ queryKey: ["posts"] });
+        await queryClient.invalidateQueries({ queryKey: ["posts"] });
       }
     },
     onError: (error: Error) => {

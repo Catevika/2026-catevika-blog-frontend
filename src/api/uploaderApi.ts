@@ -8,12 +8,15 @@ export const uploaderApi = {
     const response = await fetch("/api/upload/image", {
       method: "POST",
       body: formData,
+      credentials: "include",
     });
 
     if (!response.ok) {
-      throw new Error("Upload failed");
+      const message =
+        (await response.text().catch(() => null)) ?? "Upload failed";
+      throw new Error(message);
     }
 
-    return response.json() as Promise<ImageUploadResponse>;
+    return (await response.json()) as ImageUploadResponse;
   },
 };
