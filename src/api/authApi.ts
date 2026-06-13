@@ -31,7 +31,7 @@ export async function signupRequest(payload: SignupPayload) {
     throw new Error(message);
   }
 
-  return res.json() as Promise<AuthResponse>;
+  return (await res.json()) as Promise<AuthResponse>;
 }
 
 export async function loginRequest(payload: LoginPayload) {
@@ -65,7 +65,7 @@ export async function loginRequest(payload: LoginPayload) {
     throw new Error(message);
   }
 
-  return res.json() as Promise<AuthResponse>;
+  return (await res.json()) as Promise<AuthResponse>;
 }
 
 export async function logoutRequest(): Promise<void> {
@@ -86,5 +86,5 @@ export async function fetchMe(): Promise<AuthResponse> {
   });
 
   if (!res.ok) throw new Error("Not authenticated");
-  return res.json() as Promise<AuthResponse>;
+  return (await res.json()) as Promise<AuthResponse>;
 }

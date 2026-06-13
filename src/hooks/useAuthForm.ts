@@ -106,7 +106,7 @@ export function useAuthForm() {
       const loginData: LoginPayload = {
         email: values.email,
         password: values.password,
-        remember: rememberMe,
+        rememberMe,
       };
 
       const parsed =

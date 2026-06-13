@@ -20,12 +20,16 @@ export const useAuthStore = create<AuthStore>()(
 
       setPersistLogin: (value) => set({ persistLogin: value }),
 
-      logout: () => {
+      // Clean, centralized logout/reset logic
+      resetAuth: () => {
         set({
           user: null,
           isAuthenticated: false,
           persistLogin: false,
+          isInitialized: true,
         });
+
+        // Clear persisted storage
         localStorage.removeItem("auth-persist");
       },
     }),
@@ -33,7 +37,7 @@ export const useAuthStore = create<AuthStore>()(
       name: "auth-persist",
       storage: createJSONStorage(() => localStorage),
 
-      // Always persist persistLogin, but only persist user if remember me was checked
+      // Persist only what is allowed
       partialize: (state) => ({
         persistLogin: state.persistLogin,
         user: state.persistLogin ? state.user : null,
@@ -44,7 +48,7 @@ export const useAuthStore = create<AuthStore>()(
       onRehydrateStorage: () => (state) => {
         if (!state) return;
 
-        // If remember me was NOT checked, ensure user is cleared
+        // If remember-me was NOT checked, clear user
         if (!state.persistLogin) {
           state.setUser(null);
         }
