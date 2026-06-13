@@ -238,7 +238,7 @@ export const useLikePostMutation = () => {
   >({
     mutationFn: async ({ postId }) => {
       if (!userId) throw new Error("Must be logged in to like");
-      return likePost(postId, userId);
+      return likePost(postId, userId) as Promise<LikeResponse>;
     },
 
     onMutate: async ({ postId }) => {

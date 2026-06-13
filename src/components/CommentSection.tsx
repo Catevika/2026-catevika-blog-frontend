@@ -2,13 +2,13 @@ import { getCommentsTree } from "@/api/commentApi";
 import { useCreateComment } from "@/api/commentHooks";
 import CommentFormSection from "@/components/CommentFormSection";
 import CommentsHeader from "@/components/CommentHeader";
-import { CommentList } from "@/components/CommentList";
+import { CommentList } from "@/components/CommentList"; // <-- mobile list
 import CommentsErrorBoundary from "@/components/CommentsErrorBoundary";
 import CommentsLoading from "@/components/CommentsLoading";
-import { CommentTree } from "@/components/CommentTree";
+import { CommentTree } from "@/components/CommentTree"; // <-- desktop tree
 import NoCommentsYet from "@/components/NoCommentsYet";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useIsMobile } from "@/hooks/useIsMobile";
+import { useIsMobile } from "@/hooks/useIsMobile"; // <-- device detection
 import { useAuthStore } from "@/stores/authStore";
 import type {
   CommentsSectionProps,
@@ -60,7 +60,7 @@ const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
     error,
     refetch,
   } = useQuery<SerializedComment[], FetchError>({
-    queryKey: ["comments", postId],
+    queryKey: ["comments", postId, userId],
     queryFn: () => getCommentsTree(postId, userId),
     staleTime: 5 * 60 * 1000,
   });
@@ -114,8 +114,10 @@ const CommentsSection = ({ postId, postAuthorId }: CommentsSectionProps) => {
 
       {hasComments && comments ? (
         isMobile ? (
+          // MOBILE → flat list + show/hide replies
           <CommentList comments={comments} postId={postId} />
         ) : (
+          // DESKTOP → full nested tree
           <CommentTree comments={comments} postId={postId} />
         )
       ) : !isLoggedIn ? (
