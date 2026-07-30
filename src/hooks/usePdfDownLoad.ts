@@ -37,11 +37,9 @@ export const usePdfDownload = () => {
             const ed = errorData as { message?: string; error?: string };
             errorMessage = ed.message ?? ed.error ?? errorMessage;
           } else {
-            // If response JSON isn't an object, include status info
             errorMessage = `${errorMessage} (${response.status}: ${response.statusText})`;
           }
         } catch {
-          // If response is not JSON or parsing failed, use status text
           errorMessage = `${errorMessage} (${response.status}: ${response.statusText})`;
         }
 
@@ -50,34 +48,30 @@ export const usePdfDownload = () => {
 
       const blob = await response.blob();
 
-      // Verify blob is not empty
       if (blob.size === 0) {
         throw new Error("Generated PDF is empty");
       }
 
       console.log(`✅ PDF generated successfully (${blob.size} bytes)`);
 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-
-      // Sanitize filename: remove special characters, limit length
       const sanitizedTitle = title
         .replace(/[^a-z0-9\s-]/gi, "_")
         .replace(/\s+/g, "_")
         .substring(0, 100);
 
-      a.download = `${sanitizedTitle}.pdf`;
+      const filename = `${sanitizedTitle}.pdf`;
+      const objectUrl = URL.createObjectURL(blob);
 
-      // Trigger download
-      document.body.appendChild(a);
-      a.click();
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = filename;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(objectUrl);
 
-      // Cleanup
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      console.log(`📥 PDF download triggered: ${sanitizedTitle}.pdf`);
+      console.log(`📥 PDF download triggered: ${filename}`);
     } catch (error) {
       console.error("❌ PDF Download Failed:", error);
 

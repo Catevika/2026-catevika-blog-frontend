@@ -31,6 +31,13 @@ const API_KEY = import.meta.env.VITE_PEXELS_API_KEY;
 const client = createClient(API_KEY);
 
 export async function searchPexels(query, page = 1, perPage = 15) {
+  console.log(
+    "[searchPexels] running in",
+    typeof window === "undefined" ? "node" : "browser",
+  );
+  console.log("[searchPexels] API_KEY present", !!API_KEY);
+  console.log("[searchPexels] will call search with", { query, page, perPage });
+
   const data = await client.photos.search({
     query: query || "computer",
     page,
@@ -41,6 +48,13 @@ export async function searchPexels(query, page = 1, perPage = 15) {
 }
 
 export async function getCuratedPexels(page = 1, perPage = 15) {
+  console.log(
+    "[getCuratedPexels] running in",
+    typeof window === "undefined" ? "node" : "browser",
+  );
+  console.log("[getCuratedPexels] API_KEY present", !!API_KEY);
+  console.log("[getCuratedPexels] will call curated with", { page, perPage });
+
   const data = await client.photos.curated({
     page,
     per_page: perPage,
@@ -48,3 +62,4 @@ export async function getCuratedPexels(page = 1, perPage = 15) {
 
   return PexelsSearchResponseSchema.parse(data);
 }
+

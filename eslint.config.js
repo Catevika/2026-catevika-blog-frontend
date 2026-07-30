@@ -8,8 +8,20 @@ import { defineConfig, globalIgnores } from "eslint/config";
 export default defineConfig([
   globalIgnores(["node_modules", "dist", "coverage"]),
   {
-    files: ["**/*.{ts,tsx}"],
-    ignores: ["src/components/ui/**"],
+    files: [
+      "**/*.{ts,tsx}",
+      "playwright.config.ts",
+      "playwright.global-setup.ts",
+      "playwright.global-teardown.ts",
+      "e2e/**",
+    ],
+    ignores: [
+      "src/components/ui/**",
+      "playwright.config.ts",
+      "playwright.global-setup.ts",
+      "playwright.global-teardown.ts",
+      "e2e/**",
+    ],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommendedTypeChecked,

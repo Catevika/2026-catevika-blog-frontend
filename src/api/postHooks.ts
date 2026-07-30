@@ -1,16 +1,4 @@
-import {
-  createPost,
-  fetchFavoritesPosts,
-  fetchTrashedPosts,
-  getFeedPosts,
-  getPost,
-  getPosts,
-  getPublishedPosts,
-  likePost,
-  restorePost,
-  softDeletePost,
-  updatePost,
-} from "@/api/postApi.js";
+import * as postApi from "@/api/postApi";
 import { useAuthStore } from "@/stores/authStore";
 import type {
   GetPostsParams,
@@ -50,13 +38,14 @@ export const usePublishedPostsQuery = (params: GetPostsParams = {}) => {
   return useQuery<PaginatedPost, Error>({
     queryKey: ["publishedPosts", { page, limit, search }],
     queryFn: async () => {
-      const data = await getPublishedPosts({ page, limit, search });
+      const data = await postApi.getPublishedPosts({ page, limit, search });
       assertPaginatedPost(data);
 
       if (data.pagination.hasNextPage) {
         await queryClient.prefetchQuery({
           queryKey: ["publishedPosts", { page: page + 1, limit, search }],
-          queryFn: () => getPublishedPosts({ page: page + 1, limit, search }),
+          queryFn: () =>
+            postApi.getPublishedPosts({ page: page + 1, limit, search }),
         });
       }
 
@@ -77,13 +66,14 @@ export const useFeedPostsQuery = (params: GetPostsParams = {}) => {
   return useQuery<PaginatedPost, Error>({
     queryKey: ["feedPosts", { page, limit, search }],
     queryFn: async () => {
-      const data = await getFeedPosts({ page, limit, search });
+      const data = await postApi.getFeedPosts({ page, limit, search });
       assertPaginatedPost(data);
 
       if (data.pagination.hasNextPage) {
         await queryClient.prefetchQuery({
           queryKey: ["feedPosts", { page: page + 1, limit, search }],
-          queryFn: () => getFeedPosts({ page: page + 1, limit, search }),
+          queryFn: () =>
+            postApi.getFeedPosts({ page: page + 1, limit, search }),
         });
       }
 
@@ -106,7 +96,7 @@ export const useInProgressPostsQuery = (
   return useQuery<PaginatedPost, Error>({
     queryKey: ["inProgressPosts", { page, limit, search, author }],
     queryFn: async () => {
-      const data = await getPosts({
+      const data = await postApi.getPosts({
         page,
         limit,
         search,
@@ -124,7 +114,7 @@ export const useInProgressPostsQuery = (
             { page: page + 1, limit, search, author },
           ],
           queryFn: () =>
-            getPosts({
+            postApi.getPosts({
               page: page + 1,
               limit,
               search,
@@ -153,7 +143,7 @@ export const useTrashedPostsQuery = ({
     queryKey: ["trashPosts", page, limit, search],
     retry: false,
     queryFn: async () => {
-      const data = await fetchTrashedPosts(page, limit, search);
+      const data = await postApi.fetchTrashedPosts(page, limit, search);
       assertPaginatedPost(data);
       return data;
     },
@@ -168,8 +158,10 @@ export const useCreatePostMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation<SerializedPost, Error, Partial<SerializedPost>>({
-    mutationFn: createPost,
+    mutationFn: postApi.createPost,
     onSuccess: async (created) => {
+      if (!created || typeof created !== "object") return;
+
       if (created.status === "published") {
         await queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
       } else {
@@ -189,7 +181,7 @@ export const useUpdatePostMutation = () => {
     Error,
     { id: string } & Partial<SerializedPost>
   >({
-    mutationFn: updatePost,
+    mutationFn: postApi.updatePost,
     onSuccess: async (updatedPost) => {
       queryClient.setQueryData(["post", updatedPost.id], updatedPost);
 
@@ -204,7 +196,7 @@ export const useSoftDeletePostMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation<SerializedPost, Error, string>({
-    mutationFn: softDeletePost,
+    mutationFn: postApi.softDeletePost,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
       await queryClient.invalidateQueries({ queryKey: ["inProgressPosts"] });
@@ -217,7 +209,7 @@ export const useRestorePostMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation<SerializedPost, Error, string>({
-    mutationFn: restorePost,
+    mutationFn: postApi.restorePost,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["publishedPosts"] });
       await queryClient.invalidateQueries({ queryKey: ["inProgressPosts"] });
@@ -238,7 +230,7 @@ export const useLikePostMutation = () => {
   >({
     mutationFn: async ({ postId }) => {
       if (!userId) throw new Error("Must be logged in to like");
-      return likePost(postId, userId);
+      return postApi.likePost(postId, userId);
     },
 
     onMutate: async ({ postId }) => {
@@ -324,7 +316,14 @@ export const useLikePostMutation = () => {
 export const useFavoritesPosts = () => {
   return useQuery<{ docs: SerializedPost[] }, Error>({
     queryKey: ["favorites-posts"],
-    queryFn: fetchFavoritesPosts,
+    queryFn: async () => {
+      const data = await postApi.fetchFavoritesPosts();
+      return {
+        docs: [...data.docs]
+          .sort((a, b) => b.likeCount - a.likeCount)
+          .slice(0, 5),
+      };
+    },
     staleTime: 2 * 60 * 1000,
   });
 };
@@ -332,7 +331,7 @@ export const useFavoritesPosts = () => {
 export const useSinglePostQuery = (postId: string, userId?: string) => {
   return useQuery<SerializedPost | undefined, Error>({
     queryKey: ["post", postId],
-    queryFn: () => getPost(postId, userId),
+    queryFn: () => postApi.getPost(postId, userId),
     enabled: !!postId,
   });
 };

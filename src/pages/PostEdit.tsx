@@ -22,17 +22,19 @@ import { useNavigate, useParams } from "react-router";
 const PostEdit = () => {
   const { theme } = useTheme();
   const { id: postIdParam } = useParams<{ id: string }>();
-  const postId = postIdParam ?? "new";
-  const isNew = postId === "new";
+
+  const isNew = !postIdParam;
+  const postId = postIdParam ?? "";
 
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
 
+  // ✔ Correct: only fetch when editing
   const {
     data: existingPost,
     isLoading: isLoadingPost,
     isError: isPostError,
-  } = useSinglePostQuery(isNew ? "" : postId, user?.id);
+  } = useSinglePostQuery(postId, user?.id);
 
   const createPostMutation = useCreatePostMutation();
   const updatePostMutation = useUpdatePostMutation();
@@ -61,7 +63,7 @@ const PostEdit = () => {
     resetSlugState,
     resetToAuto,
   } = useSlugControl({
-    postId,
+    postId: postId || "new",
     draft: draft ?? undefined,
     updateDraft,
   });
@@ -83,6 +85,7 @@ const PostEdit = () => {
     resetSlugState();
   }, [resetSlugState, user?.id]);
 
+  // ✔ Correct: initialize draft for new post
   useEffect(() => {
     if (isNew) {
       queueMicrotask(() => {
@@ -91,6 +94,7 @@ const PostEdit = () => {
       return;
     }
 
+    // ✔ Correct: load existing post into draft
     if (existingPost && !draft) {
       queueMicrotask(() => {
         setDraft(existingPost);
@@ -98,6 +102,7 @@ const PostEdit = () => {
     }
   }, [isNew, existingPost, draft, user?.id]);
 
+  // Ensure author is always current user
   useEffect(() => {
     if (!user?.id) return;
 
@@ -109,17 +114,16 @@ const PostEdit = () => {
         return {
           ...prev,
           author: {
-            ...(prev.author ?? {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-            }),
+            id: user.id,
+            name: user.name,
+            email: user.email,
           },
         };
       });
     });
   }, [user]);
 
+  // update payload + correct navigation
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaveError(null);
@@ -162,16 +166,17 @@ const PostEdit = () => {
       if (isNew) {
         savedPost = await createPostMutation.mutateAsync(payload);
       } else {
+        // ✔ FIXED: force correct ID
         savedPost = await updatePostMutation.mutateAsync({
-          ...(draft ?? {}),
+          id: postId,
           ...payload,
-          id: draft?.id || postId,
         });
       }
 
       setDraft(savedPost);
       resetSlugState();
-      void navigate(`/posts/${savedPost.id}`);
+
+      navigate(`/posts/${savedPost.id}`);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : "Failed to save post.");
     } finally {
@@ -179,6 +184,7 @@ const PostEdit = () => {
     }
   };
 
+  // Loading state
   if (!isNew && isLoadingPost && !draft) {
     return (
       <section className="section">
@@ -187,6 +193,7 @@ const PostEdit = () => {
     );
   }
 
+  // Error state
   if (!isNew && isPostError && !draft) {
     return (
       <section className="section">
@@ -222,7 +229,7 @@ const PostEdit = () => {
 
         <PostForm
           ref={editorRef}
-          postId={postId}
+          postId={postId || "new"}
           theme={theme}
           draft={draft}
           originalTitle={existingPost?.title ?? ""}
@@ -240,7 +247,7 @@ const PostEdit = () => {
           onToggleLocked={toggleSlugLocked}
           onSubmit={handleSubmit}
           onReset={resetDraft}
-          onCancel={() => void navigate(-1)}
+          onCancel={() => navigate(-1)}
           onContentChange={(value) =>
             updateDraft(() => ({ content: value ?? "" }))
           }
@@ -251,6 +258,6 @@ const PostEdit = () => {
       </div>
     </section>
   );
-};
+};;
 
 export default PostEdit;

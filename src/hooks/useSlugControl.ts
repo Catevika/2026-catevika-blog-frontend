@@ -2,11 +2,7 @@ import type { SerializedPost, UseSlugControlProps } from "@/types";
 import { slugifyFinal, slugifyLive } from "@/utils/slugUtils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-export const useSlugControl = ({
-  postId,
-  draft,
-  updateDraft,
-}: UseSlugControlProps) => {
+export const useSlugControl = ({ postId, draft, updateDraft }: UseSlugControlProps) => {
   const initializedRef = useRef(false);
   const liveSlugRef = useRef<string>("");
 
@@ -50,7 +46,6 @@ export const useSlugControl = ({
   /* -------------------------
      Handlers
   ------------------------- */
-
   const handleTitleChange = useCallback(
     (value: string) => {
       updateDraft((d: SerializedPost) => {
@@ -144,4 +139,4 @@ export const useSlugControl = ({
     resetToAuto,
     resetSlugState,
   };
-};
+};;

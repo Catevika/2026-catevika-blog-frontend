@@ -153,14 +153,19 @@ export default function Feed() {
         data-state={feedQuery.isFetching ? "loading" : "loaded"}
         className="transition-opacity duration-200 data-[state=loaded]:opacity-100 data-[state=loading]:opacity-50"
       >
-        <ul className="flex flex-col gap-4">
-          {feedPosts.length > 0 ? (
+        <ul className="flex w-full flex-col gap-4">
+          {feedQuery.isLoading ? (
+            <li className="opacity-70">Loading...</li>
+          ) : feedPosts.length > 0 ? (
             feedPosts.map((post) => (
-              <Card key={post.id} className="p-4">
-                <li>
-                  <header>
-                    <div className="mb-4 flex flex-col items-center gap-2 md:flex-row md:flex-nowrap md:justify-between md:gap-0">
-                      <div className="flex gap-4">
+              <Card
+                key={post.id}
+                className="w-full min-w-0 overflow-hidden p-4"
+              >
+                <li className="w-full min-w-0 overflow-hidden">
+                  <header className="w-full overflow-hidden">
+                    <div className="mb-4 flex w-full flex-col items-start gap-2 md:flex-row md:flex-nowrap md:items-center md:justify-between md:gap-0">
+                      <div className="flex flex-wrap gap-4">
                         {post.status === "published" &&
                           post.id &&
                           post.author && (
@@ -172,7 +177,7 @@ export default function Feed() {
                               isAuthenticated={isAuthenticated}
                             />
                           )}
-                        {/* PDF Download Button */}
+
                         {post.id && (
                           <CustomPdfButton
                             postId={post.id}
@@ -185,7 +190,12 @@ export default function Feed() {
                     <AuthorForPost post={post} />
                   </header>
 
-                  <PostContent content={post.content} />
+                  <div className="mx-auto w-2xl rounded-lg px-4 py-6">
+                    <PostContent
+                      content={post.content}
+                      className="w-full max-w-full min-w-0"
+                    />
+                  </div>
                 </li>
               </Card>
             ))

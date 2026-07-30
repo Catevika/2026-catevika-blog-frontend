@@ -22,6 +22,7 @@ const PexelsPhotoCard = ({
   return (
     <article
       className="photo-card"
+      tabIndex={0}
       onDragStart={handleDragStart(photo)}
       onKeyDown={handleKeyDown}
       aria-label={`${altText} by ${photographerName}. Press Enter or Space to insert.`}

@@ -20,6 +20,7 @@ const CustomPdfButton = ({ postId, postTitle }: CustomPdfButtonProps) => {
   return (
     <div className="flex flex-col items-center">
       <Button
+        type="button"
         variant="default"
         onClick={handlePdfDownload}
         disabled={isGeneratingPdf}

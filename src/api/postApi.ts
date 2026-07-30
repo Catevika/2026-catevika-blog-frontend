@@ -126,21 +126,25 @@ export async function updatePost(
   });
 
   if (!res.ok) {
-    let message = "Failed to update post";
-    try {
-      const json = (await res.json()) as {
-        message?: string;
-        suggestion?: string;
-        errors?: Record<string, string>;
-      };
-      if (json?.message) message = json.message;
+    let json: Record<string, unknown> | null = null;
 
-      // Support backend slug conflict suggestion
-      if (res.status === 409) {
-        throw new ApiError(message, 409, json);
+    try {
+      const raw = (await res.json()) as unknown;
+
+      if (typeof raw === "object" && raw !== null) {
+        json = raw as Record<string, unknown>;
       }
     } catch {
       // ignore JSON parse errors
+    }
+
+    const message =
+      typeof json?.message === "string"
+        ? json.message
+        : "Failed to update post";
+
+    if (res.status === 409) {
+      throw new ApiError(message, 409, json);
     }
 
     throw new Error(message);

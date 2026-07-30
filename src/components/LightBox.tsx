@@ -1,6 +1,7 @@
 import CustomButton from "@/components/CustomButton";
 import type { LightBoxProps } from "@/types";
 import { useCallback, useEffect, useRef } from "react";
+import { IoCloseCircleOutline } from "react-icons/io5";
 
 const LightBox = ({ enlargedPhoto, handleCloseEnlarge }: LightBoxProps) => {
   const dialogRef = useRef<HTMLDivElement | null>(null);
@@ -112,8 +113,12 @@ const LightBox = ({ enlargedPhoto, handleCloseEnlarge }: LightBoxProps) => {
         <CustomButton
           ref={closeButtonRef}
           type="button"
-          onClick={handleCloseEnlarge}
-          className="text-background absolute top-2 right-2"
+          icon={IoCloseCircleOutline}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCloseEnlarge();
+          }}
+          className="absolute top-2 right-2 rounded-full bg-black/60 p-2 text-white backdrop-blur-sm dark:bg-white/60 dark:text-black"
           aria-label="Close enlarged photo"
         />
 

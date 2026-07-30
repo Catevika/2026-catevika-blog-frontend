@@ -2,7 +2,7 @@ import { getCuratedPexels, searchPexels } from "@/lib/pexels";
 import { usePexelsSearchStore } from "@/stores/pexelsStore";
 import type { PexelsResponse } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-
+ 
 export const usePexelsSearch = (page = 1, perPage = 15) => {
   const query = usePexelsSearchStore((s) => s.query);
 

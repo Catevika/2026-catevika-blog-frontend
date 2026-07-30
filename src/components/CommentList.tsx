@@ -31,7 +31,7 @@ function MobileCommentNode({
   const hasReplies = comment.replies && comment.replies.length > 0;
 
   return (
-    <li className="mb-4">
+    <div className="mb-4">
       <CommentItem comment={comment} postId={postId} parent={parent} />
 
       {hasReplies && !expanded && (
@@ -59,15 +59,14 @@ function MobileCommentNode({
       >
         {expanded &&
           comment.replies?.map((reply) => (
-            <ul key={reply.id} className="mt-3">
-              <MobileCommentNode
-                comment={reply}
-                postId={postId}
-                parent={comment}
-              />
-            </ul>
+            <MobileCommentNode
+              key={reply.id}
+              comment={reply}
+              postId={postId}
+              parent={comment}
+            />
           ))}
       </div>
-    </li>
+    </div>
   );
 }

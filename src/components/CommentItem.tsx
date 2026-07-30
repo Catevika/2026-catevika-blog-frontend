@@ -144,7 +144,10 @@ export default function CommentItem({
               <>
                 <Button
                   type="button"
-                  onClick={() => setIsEditing(true)}
+                  onClick={() => {
+                    setShowReply(false);
+                    setIsEditing(true);
+                  }}
                   variant="ghost"
                 >
                   <LuPencil />

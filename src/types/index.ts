@@ -33,6 +33,8 @@ export interface AuthStore {
   setUser: (user: SerializedUser | null) => void;
   setInitialized: (value: boolean) => void;
   setPersistLogin: (value: boolean) => void;
+
+  resetAuth: () => void;
 }
 
 // --------------------------------------------------
@@ -87,6 +89,10 @@ export interface PostFormValues {
 export interface PostEditHeaderProps {
   isNew: boolean;
   status: "draft" | "published";
+}
+
+export interface PostFormHandle {
+  insertAtCursor?: (markdown: string) => void;
 }
 
 export interface PostFormProps {
@@ -473,6 +479,23 @@ export interface PexelsResponse {
   prev_page?: string;
 }
 
+//------------------------------------------------------------
+// Pixel Sidebar
+//------------------------------------------------------------
+export interface PexelsSidebarProps {
+  onInsert?: (markdown: string) => void;
+}
+
+//------------------------------------------------------------
+// Pexels Photo Card
+//------------------------------------------------------------
+export interface PexelsPhotoCardProps {
+  photo: PexelsPhoto;
+  handleDragStart: (photo: PexelsPhoto) => DragEventHandler<HTMLDivElement>;
+  handleClickInsert: (photo: PexelsPhoto) => void;
+  handleOpenEnlarge: (photo: PexelsPhoto) => void;
+}
+
 // ---------------------------------------------------------
 // Image uploader
 // ---------------------------------------------------------
@@ -499,23 +522,6 @@ export interface ImageUploaderProps {
   onDragLeave?: () => void;
   maxSizeMB?: number;
   className?: string;
-}
-
-//------------------------------------------------------------
-// Pixel Sidebar
-//------------------------------------------------------------
-export interface PexelsSidebarProps {
-  onInsert?: (markdown: string) => void;
-}
-
-//------------------------------------------------------------
-// Pexels Photo Card
-//------------------------------------------------------------
-export interface PexelsPhotoCardProps {
-  photo: PexelsPhoto;
-  handleDragStart: (photo: PexelsPhoto) => DragEventHandler<HTMLDivElement>;
-  handleClickInsert: (photo: PexelsPhoto) => void;
-  handleOpenEnlarge: (photo: PexelsPhoto) => void;
 }
 
 //------------------------------------------------------------

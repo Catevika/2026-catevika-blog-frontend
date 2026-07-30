@@ -275,7 +275,7 @@ export default function PostList() {
             ) : (
               <li className="py-8 text-center">
                 {debouncedSearch
-                  ? `No in‑progress posts found for "${debouncedSearch}"`
+                  ? `No in-progress posts found for "${debouncedSearch}"`
                   : "Nothing in progress."}
               </li>
             )}

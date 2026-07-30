@@ -92,8 +92,12 @@ export function useAuthForm() {
       e.preventDefault();
 
       // Correct cooldown guard (no stale state)
-      if (cooldownRef.current !== null) return false;
-
+      if (cooldownRef.current && cooldownRef.current > 0) {
+        loginMutation.reset();
+        signupMutation.reset();
+        return false;
+      }
+      
       setFieldErrors({});
       setGlobalError(null);
 

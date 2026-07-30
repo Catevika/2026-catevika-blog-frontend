@@ -5,7 +5,13 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
 
 export default defineConfig(({ mode }) => {
-  const isTest: boolean = mode === "test";
+  const isTest = mode === "test";
+
+  // Inject environment variables for Playwright + Vitest
+  if (isTest) {
+    process.env.VITEST = "true";
+    process.env.TEST_RATE_LIMITER = "false";
+  }
 
   return {
     plugins: [
@@ -23,27 +29,40 @@ export default defineConfig(({ mode }) => {
               changeOrigin: true,
               configure: (proxy) => {
                 proxy.on("proxyRes", (proxyRes) => {
-                  // Log to confirm the header is preserved
                   const retry = proxyRes.headers["retry-after"];
                   if (retry) {
                     console.log("Proxy forwarding Retry-After:", retry);
                   } else {
-                    // If backend did NOT send a Retry-After header,
-                    // ensure no stale header is forwarded
                     delete proxyRes.headers["retry-after"];
-                    return;
                   }
                 });
               },
             },
           },
     },
+
     test: {
       environment: "jsdom",
       globals: true,
-      setupFiles: "./tests/setup.ts",
-      include: ["tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+      include: ["tests/**/*.{test,spec}.{ts,tsx}"],
       css: false,
+      isolate: false,
+      restoreMocks: true,
+      clearMocks: true,
+      mockReset: true,
+      testTimeout: 10000,
+      hookTimeout: 10000,
+      setupFiles: [
+        "tests/setup.ts",
+        "./tests/setup/server.ts",
+        "./tests/setup/setup-msw.ts",
+      ],
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "html", "lcov"],
+        reportsDirectory: "./coverage/frontend",
+        exclude: ["tests/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+      },
     },
 
     resolve: {

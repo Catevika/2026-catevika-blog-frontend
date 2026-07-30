@@ -40,7 +40,7 @@ export default function Trending() {
         data-state={isFetching ? "loading" : "loaded"}
         className="w-full transition-opacity duration-200 data-[state=loaded]:opacity-100 data-[state=loading]:opacity-50"
       >
-        <ul className="mt-4 flex w-full flex-col gap-4">
+        <ul className="mx-auto w-2xl rounded-lg px-4 py-6">
           {posts.length > 0 ? (
             posts.map((post) => (
               <Card key={post.id} className="p-4">

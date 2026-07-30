@@ -6,7 +6,7 @@ import CustomFeedButton from "@/components/CustomFeedButton";
 import CustomTrendingButton from "@/components/CustomTrendingButton";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/authStore";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { Link, useParams } from "react-router";
 import CustomEditLink from "../components/CustomEditLink";
 import CustomNewButton from "../components/CustomNewButton";
@@ -21,18 +21,28 @@ const PostView = () => {
 
   const { user, isAuthenticated } = useAuthStore();
 
+  if (!postId) {
+    return (
+      <section className="section">
+        <p className="mb-4">Invalid post ID.</p>
+        <div className="flex flex-wrap justify-center gap-0 md:flex-nowrap md:justify-start md:gap-2">
+          <CustomPublishedButton />
+        </div>
+      </section>
+    );
+  }
+
   const {
     data: post,
     isLoading,
     isError,
-    error,
-  } = useSinglePostQuery(postId!, user?.id);
+  } = useSinglePostQuery(postId, user?.id);
 
   const isAuthor = post?.author?.id === user?.id;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [postId]);
 
   if (isLoading) {
     return (
@@ -42,34 +52,10 @@ const PostView = () => {
     );
   }
 
-  if (isError) {
+  if (isError || !post) {
     return (
       <section className="p-8 text-center">
-        <p className="form-error mb-4">
-          Failed to load post
-          {error instanceof Error ? `: ${error.message}` : ""}.
-        </p>
-
-        <div className="flex flex-wrap justify-center gap-0 md:flex-nowrap md:justify-start md:gap-2">
-          <CustomPublishedButton />
-        </div>
-      </section>
-    );
-  }
-
-  if (!postId) {
-    return (
-      <section className="section">
-        <p className="mb-4">Post not found.</p>
-      </section>
-    );
-  }
-
-  if (!post) {
-    return (
-      <section className="section">
-        <p className="mb-4">Post not found.</p>
-
+        <p className="form-error mb-4">Post not found</p>
         <div className="flex flex-wrap justify-center gap-0 md:flex-nowrap md:justify-start md:gap-2">
           <CustomPublishedButton />
         </div>
@@ -99,7 +85,10 @@ const PostView = () => {
             <CustomPdfButton postId={postId} postTitle={post.title} />
           </div>
           {!user ? (
-            <Link to="/auth" className="mt-2 text-sm hover:underline sm:mt-0">
+            <Link
+              to="/auth"
+              className="mx-4 mt-2 text-sm hover:underline sm:mt-0"
+            >
               <em>Log in to edit, like or comment this post</em>
             </Link>
           ) : null}
