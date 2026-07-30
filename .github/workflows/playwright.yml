@@ -1,27 +1,90 @@
 name: Playwright Tests
+
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
+
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:6
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd="mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Node
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install root dependencies
+      - name: Install root dependencies
+        run: npm install
+
+      # Install Playwright browsers
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      # Install backend dependencies
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm install
+
+      # Install ts-node globally (needed for seed script)
+      - name: Install ts-node
+        run: npm install -g ts-node
+
+      # Start backend server
+      - name: Start backend
+        working-directory: backend
+        run: |
+          npm run build
+          npm run start &
+        env:
+          MONGO_URI: mongodb://localhost:27017/blog-app-test
+          JWT_SECRET: supersecret
+          PORT: 4000
+
+      # Seed database
+      - name: Seed database
+        working-directory: backend
+        run: ts-node --project tsconfig.scripts.json scripts/seed.ts
+        env:
+          MONGO_URI: mongodb://localhost:27017/blog-app-test
+
+      # Install frontend dependencies
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      # Start frontend (Vite preview)
+      - name: Start frontend
+        working-directory: frontend
+        run: |
+          npm run build
+          npm run preview --port 3000 &
+        env:
+          VITE_API_URL: http://localhost:4000
+
+      # Wait for backend + frontend to be ready
+      - name: Wait for servers
+        run: npx wait-on http://localhost:3000 http://localhost:4000
+
+      # Run Playwright tests
+      - name: Run Playwright tests
+        run: npx playwright test --reporter=dot

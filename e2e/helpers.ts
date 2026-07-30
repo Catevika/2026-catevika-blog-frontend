@@ -49,6 +49,8 @@ export async function loginUI(
 
   // Ensure the form is present
   await page.waitForSelector("#post-form");
+
+  await page.waitForLoadState("networkidle");
 }
 
 /**
