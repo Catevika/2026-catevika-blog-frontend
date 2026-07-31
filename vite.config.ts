@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
         ? undefined
         : {
             "/api": {
-              target: "http://localhost:4000",
+              target: "http://localhost:10000",
               changeOrigin: true,
               configure: (proxy) => {
                 proxy.on("proxyRes", (proxyRes) => {
