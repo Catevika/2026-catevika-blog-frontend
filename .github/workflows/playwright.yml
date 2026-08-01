@@ -25,7 +25,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests (with server)
-        run: npx start-server-and-test "npm run preview" http://localhost:3000 "npx playwright test"
+        run: npx start-server-and-test "npm run preview" http://127.0.0.1:3000 "npx playwright test"
 
       - name: Upload Playwright HTML report
         uses: actions/upload-artifact@v4
