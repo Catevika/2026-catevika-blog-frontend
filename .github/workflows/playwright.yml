@@ -29,7 +29,7 @@ jobs:
         run: npm run build
 
       - name: Start frontend (Vite preview)
-        run: npm run preview --port 3000 &
+        run: npm run preview
         env:
           VITE_API_URL: https://two026-blog-app-backend.onrender.com
 
