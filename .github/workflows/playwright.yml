@@ -24,20 +24,9 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # --- FRONTEND PREVIEW SERVER ---
-      - name: Start frontend (Vite preview)
-        run: npm run preview &
-        env:
-          NODE_ENV: production
+      - name: Run Playwright tests (with server)
+        run: npx start-server-and-test "npm run preview" http://localhost:3000 "npx playwright test"
 
-      - name: Wait for frontend
-        run: npx wait-on http://localhost:3000
-
-      # --- RUN TESTS ---
-      - name: Run Playwright tests
-        run: npx playwright test
-
-      # --- UPLOAD REPORT ---
       - name: Upload Playwright HTML report
         uses: actions/upload-artifact@v4
         if: always()
