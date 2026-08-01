@@ -15,7 +15,7 @@ export default defineConfig({
   preserveOutput: "failures-only",
 
   use: {
-    baseURL: "http://localhost:5173",
+    baseURL: "http://localhost:3000",
     // video: "on", // record videos for ALL tests
     trace: "on", // record trace for ALL tests
     screenshot: "only-on-failure",
@@ -29,7 +29,8 @@ export default defineConfig({
 
   webServer: {
     command: "npm run preview",
-    url: "http://localhost:5173",
+    url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
+    timeout: 120000,
   },
 });
