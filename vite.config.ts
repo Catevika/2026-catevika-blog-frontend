@@ -21,24 +21,25 @@ export default defineConfig(({ mode }) => {
     ],
 
     server: {
-      proxy: isTest
-        ? undefined
-        : {
-            "/api": {
-              target: "http://localhost:10000",
-              changeOrigin: true,
-              configure: (proxy) => {
-                proxy.on("proxyRes", (proxyRes) => {
-                  const retry = proxyRes.headers["retry-after"];
-                  if (retry) {
-                    console.log("Proxy forwarding Retry-After:", retry);
-                  } else {
-                    delete proxyRes.headers["retry-after"];
-                  }
-                });
+      proxy:
+        isTest || process.env.CI
+          ? undefined
+          : {
+              "/api": {
+                target: "http://localhost:4000",
+                changeOrigin: true,
+                configure: (proxy) => {
+                  proxy.on("proxyRes", (proxyRes) => {
+                    const retry = proxyRes.headers["retry-after"];
+                    if (retry) {
+                      console.log("Proxy forwarding Retry-After:", retry);
+                    } else {
+                      delete proxyRes.headers["retry-after"];
+                    }
+                  });
+                },
               },
             },
-          },
     },
 
     test: {
