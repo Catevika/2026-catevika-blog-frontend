@@ -21,6 +21,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Warm up backend (Render cold-start fix)
+        run: |
+          echo "Warming up backend..."
+          curl -s -o /dev/null https://two026-blog-app-backend.onrender.com/api/auth/login || true
+
       - name: Build frontend
         run: npm run build
 
@@ -29,7 +34,6 @@ jobs:
 
       - name: Run Playwright tests (with server)
         env:
-          # Your deployed backend URL on Render
           VITE_API_URL: https://two026-blog-app-backend.onrender.com
         run: npx start-server-and-test \
           "npm run preview" \
