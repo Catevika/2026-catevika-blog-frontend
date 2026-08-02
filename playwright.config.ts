@@ -1,25 +1,31 @@
 /// <reference types="node" />
 import { defineConfig, devices } from "@playwright/test";
 
+const isCI = !!process.env.CI;
+const isLocalProd = !!process.env.PLAYWRIGHT_PROD;
+
 export default defineConfig({
   testDir: "./e2e",
 
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  forbidOnly: isCI,
+  retries: isCI ? 2 : 0,
+  workers: isCI ? 2 : undefined,
   timeout: 60_000,
 
   reporter: "html",
-
-  // Keep the output of the LAST run only
   preserveOutput: "failures-only",
 
   use: {
-    baseURL: process.env.BASE_URL ?? "http://127.0.0.1:3000",
-    // video: "on", // record videos for ALL tests
-    trace: "on", // record trace for ALL tests
+    baseURL:
+      process.env.BASE_URL ??
+      (isCI || isLocalProd ? "http://127.0.0.1:3000" : "http://localhost:5173"),
+
+    trace: "on",
     screenshot: "only-on-failure",
+
+    // Prevent infinite hangs
+    navigationTimeout: 15000,
   },
 
   projects: [
@@ -29,9 +35,17 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: "npm run preview",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: true,
+    command:
+      isCI || isLocalProd
+        ? "vite preview --host 127.0.0.1 --port 3000"
+        : "npm run dev",
+
+    url:
+      isCI || isLocalProd ? "http://127.0.0.1:3000" : "http://localhost:5173",
+
+    // CI must NOT reuse the server
+    reuseExistingServer: !isCI,
+
     timeout: 120000,
   },
 });

@@ -18,6 +18,7 @@ export default defineConfig([
     ignores: [
       "src/components/ui/**",
       "playwright.config.ts",
+      "playwright.local.config.ts",
       "playwright.global-setup.ts",
       "playwright.global-teardown.ts",
       "e2e/**",
