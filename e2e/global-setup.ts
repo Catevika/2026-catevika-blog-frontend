@@ -10,21 +10,28 @@ async function globalSetup(config: FullConfig) {
 
   // Keep pinging Render for up to 60 seconds until it wakes up
   while (Date.now() - start < 60000) {
+    // Create an abort controller to prevent individual requests from hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     try {
-      const response = await fetch(url);
-      if (
-        response.status === 401 ||
-        response.status === 200 ||
-        response.status === 404
-      ) {
-        console.log("✅ Render backend is active and responding!");
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      // Any HTTP response status means the server container is fully awake and routing traffic
+      if (response.status >= 200 && response.status < 500) {
+        console.log(
+          `✅ Render backend is active and responding with status: ${response.status}`,
+        );
         return;
       }
     } catch (error) {
-      // Server is still sleeping, wait 3 seconds and try again
+      clearTimeout(timeoutId);
+      // Quietly wait 3 seconds before trying again if server is sleeping or connection is refused
       await new Promise((resolve) => setTimeout(resolve, 3000));
     }
   }
+
   console.warn(
     "⚠️ Warning: Render server warming timed out. Tests will proceed but might be slow.",
   );
