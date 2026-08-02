@@ -22,12 +22,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Start backend
+        run: |
+          npm run backend:start &
+        env:
+          NODE_ENV: test
+
       - name: Build frontend
         run: npm run build
-
-      # IMPORTANT:
-      # Do NOT start the preview server manually.
-      # Playwright will start it using webServer.command.
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
