@@ -4,13 +4,15 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
 
-  fullyParallel: true,
+  globalSetup: "./e2e/global-setup.ts",
+
+  fullyParallel: false, // 🚀 Keep false or low workers if hitting a single shared test database
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
-  timeout: 60_000,
+  workers: process.env.CI ? 1 : undefined, // Dropping to 1 worker on CI stops concurrent write database conflicts
+  timeout: 90_000, // 90 seconds total test timeout limit
 
-  reporter: [["list"], ["html"]],
+  reporter: process.env.CI ? [["github"], ["line"]] : [["list"], ["html"]],
 
   preserveOutput: "failures-only",
 
@@ -18,7 +20,9 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:3000",
     trace: "on",
     screenshot: "only-on-failure",
-    navigationTimeout: 15000,
+    // 🚀 SCALE TIMEOUTS FOR THE REMOTE BACKEND
+    actionTimeout: 20000, // 20s allowance for clicks and fills
+    navigationTimeout: 30000, // 30s allowance for page transitions/networkidle
   },
 
   projects: [
@@ -31,6 +35,6 @@ export default defineConfig({
     command: "npx vite preview --host 127.0.0.1 --port 3000",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: false,
-    timeout: 60000, // 1 minute is plenty now that the build is already done
+    timeout: 60000,
   },
 });
