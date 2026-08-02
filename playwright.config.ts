@@ -13,7 +13,9 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined, // Dropping to 1 worker on CI stops concurrent write database conflicts
   timeout: 90_000, // 90 seconds total test timeout limit
 
-  reporter: process.env.CI ? [["github"], ["line"]] : [["list"], ["html"]],
+  reporter: process.env.CI
+    ? [["github"], ["line"], ["html", { open: "never" }]]
+    : [["list"], ["html"]],
 
   preserveOutput: "failures-only",
 
