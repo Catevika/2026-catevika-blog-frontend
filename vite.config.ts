@@ -3,15 +3,37 @@ import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
+import type { IncomingMessage } from "node:http";
+import type { EventEmitter } from "node:events";
 
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test";
 
-  // Inject environment variables for Playwright + Vitest
   if (isTest) {
     process.env.VITEST = "true";
     process.env.TEST_RATE_LIMITER = "false";
   }
+
+  const apiTarget = process.env.CI
+    ? "https://onrender.com"
+    : "http://localhost:4000";
+
+  const proxyConfig = {
+    "/api": {
+      target: apiTarget,
+      changeOrigin: true,
+      configure: (proxy: EventEmitter) => {
+        proxy.on("proxyRes", (proxyRes: IncomingMessage) => {
+          const retry = proxyRes.headers["retry-after"];
+          if (retry) {
+            console.log("Proxy forwarding Retry-After:", retry);
+          } else {
+            delete proxyRes.headers["retry-after"];
+          }
+        });
+      },
+    },
+  };
 
   return {
     plugins: [
@@ -21,25 +43,13 @@ export default defineConfig(({ mode }) => {
     ],
 
     server: {
-      proxy:
-        isTest || process.env.CI
-          ? undefined
-          : {
-              "/api": {
-                target: "http://localhost:4000",
-                changeOrigin: true,
-                configure: (proxy) => {
-                  proxy.on("proxyRes", (proxyRes) => {
-                    const retry = proxyRes.headers["retry-after"];
-                    if (retry) {
-                      console.log("Proxy forwarding Retry-After:", retry);
-                    } else {
-                      delete proxyRes.headers["retry-after"];
-                    }
-                  });
-                },
-              },
-            },
+      port: 5173,
+      proxy: isTest ? undefined : proxyConfig,
+    },
+
+    preview: {
+      port: 5173,
+      proxy: isTest ? undefined : proxyConfig,
     },
 
     test: {
