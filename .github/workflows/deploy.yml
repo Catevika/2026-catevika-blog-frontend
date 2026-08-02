@@ -13,6 +13,12 @@ jobs:
       contents: read
       statuses: write
       pull-requests: write
+      
+    # 🚀 GLOBAL ENVIRONMENT VARIABLES: Available for all steps (Build, Tests, and Deploy)
+    env:
+      VITE_API_URL: https://two026-blog-app-backend.onrender.com
+      VITE_PEXELS_API_KEY: ${{ secrets.VERCEL_PEXELS_API_KEY }}
+
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4.2.2
@@ -29,18 +35,15 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      # 🚀 CRITICAL: Compile the Vite app before running Playwright tests
+      # Vite will now successfully read both global variables at compile time!
       - name: Build Vite application for E2E testing
         run: npm run build
-        env:
-          VITE_API_URL: https://onrender.com
 
       - name: Run Playwright E2E tests
         run: npm run test:e2e
         env:
           CI: true 
 
-      # Automatically saves snapshots and logs if tests fail
       - name: Upload Playwright report artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -56,7 +59,7 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           if [ -z "${{ secrets.VERCEL_TOKEN }}" ] || [ -z "${{ secrets.VERCEL_ORG_ID }}" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
-            echo "❌ Error: One or more Vercel deployment secrets are missing from GitHub Repository Secrets."
+            echo "❌ Error: One or more Vercel deployment secrets are missing."
             exit 1
           fi
           echo "✅ Vercel configuration keys found in GitHub."
@@ -70,10 +73,9 @@ jobs:
         run: |
           echo "🔄 Validating credentials and pulling environment from Vercel..."
           if ! vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}; then
-            echo "❌ Error: Vercel authentication failed! Check your token/project IDs."
+            echo "❌ Error: Vercel authentication failed!"
             exit 1
           fi
-          echo "✅ Vercel credentials validated successfully."
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -91,3 +93,4 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          
