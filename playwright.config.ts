@@ -35,7 +35,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: "npx vite preview --host 127.0.0.1 --port 3000",
+    command: "npx vite preview --host 127.0.0.1 --port 3000 --single",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: false,
     timeout: 60000,
