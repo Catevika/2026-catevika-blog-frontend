@@ -2,13 +2,17 @@ name: CI/CD Frontend Vite
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   test-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      statuses: write
+      pull-requests: write
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4.2.2
@@ -16,8 +20,8 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.1.0
         with:
-          node-version: "24.18.0"
-          cache: "npm"
+          node-version: '24.18.0'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -25,10 +29,29 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      # 🚀 CRITICAL: Compile the Vite app before running Playwright tests
+      - name: Build Vite application for E2E testing
+        run: npm run build
+        env:
+          VITE_API_URL: https://onrender.com
+
       - name: Run Playwright E2E tests
         run: npm run test:e2e
+        env:
+          CI: true 
 
-      # 1. STRUCTURAL CHECK: Are the secrets actually inside GitHub?
+      # Automatically saves snapshots and logs if tests fail
+      - name: Upload Playwright report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      # ----------------------------------------------------
+      # DEPLOYMENT PHASE (Only triggers on push to main branch)
+      # ----------------------------------------------------
       - name: Verify Vercel deployment credentials presence
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
@@ -42,14 +65,12 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: npm install --global vercel@latest
 
-      # 2. VALIDITY CHECK: Are the keys actually valid on Vercel's servers?
       - name: Pull Vercel environment configurations
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           echo "🔄 Validating credentials and pulling environment from Vercel..."
           if ! vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}; then
-            echo "❌ Error: Vercel authentication failed!"
-            echo "Please check if your VERCEL_TOKEN has expired or if VERCEL_ORG_ID / VERCEL_PROJECT_ID are invalid."
+            echo "❌ Error: Vercel authentication failed! Check your token/project IDs."
             exit 1
           fi
           echo "✅ Vercel credentials validated successfully."
@@ -57,7 +78,7 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Build Vite production artifacts
+      - name: Build production artifacts for Vercel
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:

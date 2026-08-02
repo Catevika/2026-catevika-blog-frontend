@@ -28,10 +28,9 @@ export default defineConfig({
   ],
 
   webServer: {
-    command:
-      "VITE_API_URL=https://two026-blog-app-backend.onrender.com vite preview --host 127.0.0.1 --port 3000",
+    command: "npx vite preview --host 127.0.0.1 --port 3000",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: false,
-    timeout: 120000,
+    timeout: 60000, // 1 minute is plenty now that the build is already done
   },
 });
