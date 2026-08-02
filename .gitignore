@@ -33,4 +33,6 @@ coverage
 /playwright/.cache/
 /playwright/.auth/
 
-notes.md
+NOTES.md
+.vercel
+.env*

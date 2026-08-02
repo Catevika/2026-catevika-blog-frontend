@@ -1,0 +1,72 @@
+name: CI/CD Frontend Vite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: "24.18.0"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright E2E tests
+        run: npm run test:e2e
+
+      # 1. STRUCTURAL CHECK: Are the secrets actually inside GitHub?
+      - name: Verify Vercel deployment credentials presence
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ] || [ -z "${{ secrets.VERCEL_ORG_ID }}" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            echo "❌ Error: One or more Vercel deployment secrets are missing from GitHub Repository Secrets."
+            exit 1
+          fi
+          echo "✅ Vercel configuration keys found in GitHub."
+
+      - name: Install Vercel CLI globally
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: npm install --global vercel@latest
+
+      # 2. VALIDITY CHECK: Are the keys actually valid on Vercel's servers?
+      - name: Pull Vercel environment configurations
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          echo "🔄 Validating credentials and pulling environment from Vercel..."
+          if ! vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}; then
+            echo "❌ Error: Vercel authentication failed!"
+            echo "Please check if your VERCEL_TOKEN has expired or if VERCEL_ORG_ID / VERCEL_PROJECT_ID are invalid."
+            exit 1
+          fi
+          echo "✅ Vercel credentials validated successfully."
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build Vite production artifacts
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy prebuilt artifacts to Vercel
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
