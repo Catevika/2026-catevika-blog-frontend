@@ -9,8 +9,7 @@ export default defineConfig({
   fullyParallel: false, // 🚀 Keep false or low workers if hitting a single shared test database
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 0 : 0,
-  maxFailures: process.env.CI ? 1 : undefined, // 🚀 Fail-Fast
-
+  maxFailures: process.env.CI ? 1 : undefined, // 🚀 automatic ail-Fast
   workers: process.env.CI ? 1 : undefined, // Dropping to 1 worker on CI stops concurrent write database conflicts
   timeout: 90_000, // 90 seconds total test timeout limit
 
@@ -19,7 +18,7 @@ export default defineConfig({
   preserveOutput: "failures-only",
 
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://127.0.0.1:3000",
     trace: "on",
     screenshot: "only-on-failure",
     // 🚀 SCALE TIMEOUTS FOR THE REMOTE BACKEND
@@ -34,8 +33,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: "npx vite preview --port 3000",
-    url: "http://localhost:3000",
+    command: "npx vite preview --host 127.0.0.1 --port 3000",
+    url: "http://127.0.0.1:3000",
     reuseExistingServer: false,
     timeout: 60000,
   },
