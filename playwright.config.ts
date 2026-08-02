@@ -20,8 +20,7 @@ export default defineConfig({
   preserveOutput: "failures-only",
 
   use: {
-    // 🚀 MATCH YOUR LOCAL WORKING PORT (5173)
-    baseURL: "http://127.0.0.1:5173",
+    baseURL: "http://127.0.0.1:4173",
     trace: "on",
     screenshot: "only-on-failure",
     actionTimeout: 15000,
@@ -31,8 +30,8 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { browserName: "chromium" } }],
 
   webServer: {
-    command: "npx vite preview --host 127.0.0.1 --port 5173",
-    url: "http://127.0.0.1:5173",
+    command: "npx vite preview --host 127.0.0.1 --port 4173",
+    url: "http://127.0.0.1:4173",
     reuseExistingServer: false,
     timeout: 60000,
   },

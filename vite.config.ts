@@ -3,19 +3,21 @@ import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
-import type { IncomingMessage } from "node:http";
+import type { PreviewServer } from "vite";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import type { EventEmitter } from "node:events";
 
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test";
 
+  // Inject environment variables for Playwright + Vitest
   if (isTest) {
     process.env.VITEST = "true";
     process.env.TEST_RATE_LIMITER = "false";
   }
 
   const apiTarget = process.env.CI
-    ? "https://onrender.com"
+    ? "https://two026-blog-app-backend.onrender.com"
     : "http://localhost:4000";
 
   const proxyConfig = {
@@ -48,8 +50,22 @@ export default defineConfig(({ mode }) => {
     },
 
     preview: {
-      port: 5173,
+      port: 4173,
       proxy: isTest ? undefined : proxyConfig,
+      configurePreviewServer: (server: PreviewServer) => {
+        server.middlewares.use(
+          (req: IncomingMessage, _res: ServerResponse, next: () => void) => {
+            if (
+              req.url &&
+              !req.url.includes(".") &&
+              !req.url.startsWith("/api")
+            ) {
+              req.url = "/index.html";
+            }
+            next();
+          },
+        );
+      },
     },
 
     test: {
