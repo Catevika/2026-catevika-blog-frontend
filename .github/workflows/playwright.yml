@@ -22,17 +22,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Start backend
-        run: |
-          npm run backend:start &
-        env:
-          NODE_ENV: test
-
       - name: Build frontend
+        env:
+          VITE_API_URL: https://two026-blog-app-backend.onrender.com
         run: npm run build
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
+        env:
+          VITE_API_URL: https://two026-blog-app-backend.onrender.com
         run: npx playwright test
