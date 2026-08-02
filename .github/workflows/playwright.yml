@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Warm up backend (Render cold-start fix)
+      - name: Warm up backend
         run: |
           echo "Warming up backend..."
           curl -fsS --max-time 10 https://two026-blog-app-backend.onrender.com/api/health || true
