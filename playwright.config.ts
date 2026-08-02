@@ -8,7 +8,9 @@ export default defineConfig({
 
   fullyParallel: false, // 🚀 Keep false or low workers if hitting a single shared test database
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 0 : 0,
+  maxFailures: process.env.CI ? 1 : undefined, // 🚀 Fail-Fast
+
   workers: process.env.CI ? 1 : undefined, // Dropping to 1 worker on CI stops concurrent write database conflicts
   timeout: 90_000, // 90 seconds total test timeout limit
 
