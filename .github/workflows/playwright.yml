@@ -39,7 +39,7 @@ jobs:
         env:
           PORT: 3000
           VITE_API_URL: https://two026-blog-app-backend.onrender.com
-        run: npm run preview -- --host 127.0.0.1 --port 3000 &
+        run: npm run preview &
 
       - name: Wait for preview
         run: npx wait-on http://127.0.0.1:3000
