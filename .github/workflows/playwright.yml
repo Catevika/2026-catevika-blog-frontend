@@ -8,6 +8,7 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
@@ -24,13 +25,26 @@ jobs:
 
       - name: Build frontend
         env:
-          VITE_API_URL: https://two026-blog-app-backend.onrender.com
+          VITE_API_URL: ${{ secrets.RENDER_API_URL }}
         run: npm run build
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      # Optional debug step (temporary): show a short snippet of the built index.html
+      # Remove this step once you confirm the build contains the correct URL.
+      # - name: Show built index.html snippet
+      #   if: always()
+      #   run: sed -n '1,120p' dist/index.html
+
       - name: Run Playwright tests
         env:
-          VITE_API_URL: https://two026-blog-app-backend.onrender.com
-        run: npx playwright test
+          VITE_API_URL: ${{ secrets.RENDER_API_URL }}
+        run: npx playwright test --reporter=list
+
+      - name: Upload Playwright traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: playwright-report/**/*.zip
