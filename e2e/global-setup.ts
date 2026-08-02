@@ -6,7 +6,7 @@ async function globalSetup(config: FullConfig) {
   );
 
   const start = Date.now();
-  const url = "https://onrender.com";
+  const url = "https://two026-blog-app-backend.onrender.com";
 
   // Keep pinging Render for up to 60 seconds until it wakes up
   while (Date.now() - start < 60000) {
