@@ -31,8 +31,7 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { browserName: "chromium" } }],
 
   webServer: {
-    // 🚀 RUN PREVIEW ON PORT 5173 WITH SINGLE-PAGE-APP BACKING
-    command: "npx vite preview --host 127.0.0.1 --port 5173 --single",
+    command: "npx vite preview --host 127.0.0.1 --port 5173",
     url: "http://127.0.0.1:5173",
     reuseExistingServer: false,
     timeout: 60000,
