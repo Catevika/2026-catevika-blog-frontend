@@ -13,7 +13,10 @@ export default defineConfig({
   workers: isCI ? 2 : undefined,
   timeout: 60_000,
 
-  reporter: "html",
+  reporter: [
+    ["list"], // <-- THIS makes GitHub Actions show passing tests
+    ["html"],
+  ],
   preserveOutput: "failures-only",
 
   use: {
