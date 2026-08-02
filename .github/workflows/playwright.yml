@@ -17,28 +17,37 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Warm up backend (Render cold-start fix)
+      - name: Warm up backend
         run: |
           echo "Warming up backend..."
-          curl -s -o /dev/null https://two026-blog-app-backend.onrender.com/api/auth/login || true
+          curl -fsS --max-time 10 https://two026-blog-app-backend.onrender.com/api/health || true
 
       - name: Build frontend
+        env:
+          VITE_API_URL: https://two026-blog-app-backend.onrender.com
         run: npm run build
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Run Playwright tests (with server)
+      - name: Start preview server
         env:
+          PORT: 3000
           VITE_API_URL: https://two026-blog-app-backend.onrender.com
-        run: npx start-server-and-test \
-          "npm run preview" \
-          http://127.0.0.1:3000 \
-          "npx playwright test"
+        run: npm run preview -- --host 127.0.0.1 --port 3000 &
+
+      - name: Wait for preview
+        run: npx wait-on http://127.0.0.1:3000
+
+      - name: Run Playwright tests
+        env:
+          BASE_URL: http://127.0.0.1:3000
+        run: npx playwright test
 
       - name: Upload Playwright HTML report
         uses: actions/upload-artifact@v4

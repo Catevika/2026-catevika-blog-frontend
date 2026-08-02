@@ -15,7 +15,7 @@ export default defineConfig({
   preserveOutput: "failures-only",
 
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: process.env.BASE_URL ?? "http://127.0.0.1:3000",
     // video: "on", // record videos for ALL tests
     trace: "on", // record trace for ALL tests
     screenshot: "only-on-failure",
