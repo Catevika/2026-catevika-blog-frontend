@@ -1,33 +1,23 @@
 /// <reference types="node" />
-import { defineConfig, devices } from "@playwright/test";
-
-const isCI = !!process.env.CI;
-const isLocalProd = !!process.env.PLAYWRIGHT_PROD;
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
 
   fullyParallel: true,
-  forbidOnly: isCI,
-  retries: isCI ? 2 : 0,
-  workers: isCI ? 2 : undefined,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 2 : undefined,
   timeout: 60_000,
 
-  reporter: [
-    ["list"], // <-- THIS makes GitHub Actions show passing tests
-    ["html"],
-  ],
+  reporter: [["list"], ["html"]],
+
   preserveOutput: "failures-only",
 
   use: {
-    baseURL:
-      process.env.BASE_URL ??
-      (isCI || isLocalProd ? "http://127.0.0.1:3000" : "http://localhost:5173"),
-
+    baseURL: "http://127.0.0.1:3000",
     trace: "on",
     screenshot: "only-on-failure",
-
-    // Prevent infinite hangs
     navigationTimeout: 15000,
   },
 
@@ -39,16 +29,9 @@ export default defineConfig({
 
   webServer: {
     command:
-      isCI || isLocalProd
-        ? "vite preview --host 127.0.0.1 --port 3000"
-        : "npm run dev",
-
-    url:
-      isCI || isLocalProd ? "http://127.0.0.1:3000" : "http://localhost:5173",
-
-    // CI must NOT reuse the server
-    reuseExistingServer: !isCI,
-
+      "VITE_API_URL=https://two026-blog-app-backend.onrender.com vite preview --host 127.0.0.1 --port 3000",
+    url: "http://127.0.0.1:3000",
+    reuseExistingServer: false,
     timeout: 120000,
   },
 });
