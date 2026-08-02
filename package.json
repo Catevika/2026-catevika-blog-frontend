@@ -10,7 +10,7 @@
     "dev:host": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview --host 127.0.0.1 --port 3000",
+    "preview": "vite preview --port 3000",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",

@@ -17,7 +17,7 @@ export default defineConfig({
   preserveOutput: "failures-only",
 
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://localhost:3000",
     trace: "on",
     screenshot: "only-on-failure",
     // 🚀 SCALE TIMEOUTS FOR THE REMOTE BACKEND
@@ -32,8 +32,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: "npx vite preview --host 127.0.0.1 --port 3000",
-    url: "http://127.0.0.1:3000",
+    command: "npx vite preview --port 3000",
+    url: "http://localhost:3000",
     reuseExistingServer: false,
     timeout: 60000,
   },
