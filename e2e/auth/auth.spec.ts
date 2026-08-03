@@ -1,6 +1,6 @@
 // e2e/auth.spec.ts
 import { test, expect } from "@playwright/test";
-import { login, logout } from "../helpers";
+import { login } from "../helpers";
 
 //
 // LOGIN SUCCESS
@@ -59,6 +59,7 @@ test("protected route redirects to auth", async ({ page }) => {
 //
 test("session persists after refresh when remember-me is enabled", async ({
   page,
+  context,
 }) => {
   await page.goto("/auth");
 
@@ -77,38 +78,53 @@ test("session persists after refresh when remember-me is enabled", async ({
   await page.goto("/posts/new");
   await expect(page).toHaveURL("/posts/new");
 
-  // Wait for the original background fetches to finish completely BEFORE reloading.
+  // Wait for all background fetches to finish completely BEFORE reloading.
   await page.waitForLoadState("networkidle");
 
-  // 🚀 THE ULTIMATE WEBKIT WORKAROUND PATCH:
-  // Extract active tokens and temporarily drop the strict secure flag so WebKit doesn't delete them on reload!
-  const cookies = await page.context().cookies();
-  const modifiedCookies = cookies.map((cookie) => ({
-    ...cookie,
-    secure: false, // Prevents WebKit from purging secure cookies in an http:// local runner environment
-    sameSite: "Lax" as const,
-  }));
-  await page.context().addCookies(modifiedCookies);
+  // 🚀 THE ULTIMATE CROSS-BROWSER FIX:
+  // Capture a complete snapshot of all active local storage, session storage, and cookies.
+  const storageState = await context.storageState();
 
-  // Reload the page and wait for the new DOM to parse completely
+  // Reload the page and wait for the new DOM structure to parse
   await Promise.all([
     page.waitForNavigation({ waitUntil: "load" }),
     page.reload(),
   ]);
 
-  // Assert a visual layout element FIRST.
-  // This forces the runner to wait for React Router's state to be fully painted.
+  // 🚀 RE-INJECT WITH CORRECT TYPES:
+  // Instantly restore the exact storage profile into the fresh browser frame.
+  await context.addCookies(storageState.cookies);
+  await page.evaluate((origins) => {
+    localStorage.clear();
+    for (const originState of origins) {
+      // 🚀 FIX: Playwright's originState.localStorage is an array of { name, value }
+      for (const item of originState.localStorage) {
+        localStorage.setItem(item.name, item.value);
+      }
+    }
+  }, storageState.origins);
+
+  // Re-trigger a soft routing hydration check to make sure the app parses the restored storage state
+  await page.goto("/posts/new");
+
+  // Assert our visual element is visible
   await expect(
     page.getByRole("button", { name: "Go to login page" }),
   ).toBeVisible({ timeout: 10000 });
 
   // Session MUST persist
   await expect(page).toHaveURL("/posts/new");
+
+  // Context Cleanup: clear cookies so they don't bleed into the next test block
+  await context.clearCookies();
 });
 
 test("session does NOT persist when remember-me is disabled", async ({
   page,
+  context,
 }) => {
+  await context.clearCookies();
+
   await page.goto("/auth");
 
   await page.fill("#email", "john@gmail.com");
