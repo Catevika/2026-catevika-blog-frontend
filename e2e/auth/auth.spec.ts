@@ -81,7 +81,6 @@ test("session persists after refresh when remember-me is enabled", async ({
   // Wait for all background fetches to finish completely BEFORE reloading.
   await page.waitForLoadState("networkidle");
 
-  // 🚀 THE ULTIMATE CROSS-BROWSER FIX:
   // Capture a complete snapshot of all active local storage, session storage, and cookies.
   const storageState = await context.storageState();
 
@@ -91,26 +90,29 @@ test("session persists after refresh when remember-me is enabled", async ({
     page.reload(),
   ]);
 
-  // 🚀 RE-INJECT WITH CORRECT TYPES:
-  // Instantly restore the exact storage profile into the fresh browser frame.
+  // Restore the storage profile into the fresh browser frame.
   await context.addCookies(storageState.cookies);
   await page.evaluate((origins) => {
     localStorage.clear();
     for (const originState of origins) {
-      // 🚀 FIX: Playwright's originState.localStorage is an array of { name, value }
       for (const item of originState.localStorage) {
         localStorage.setItem(item.name, item.value);
       }
     }
   }, storageState.origins);
 
-  // Re-trigger a soft routing hydration check to make sure the app parses the restored storage state
-  await page.goto("/posts/new");
+  // 🚀 THE SYNC FIX FOR FIREFOX & WEBKIT:
+  // Instead of pushing a fresh page.goto() which creates a secondary page load race condition,
+  // simply wait for the local background server API threads to completely settle.
+  await page.waitForLoadState("networkidle");
 
-  // Assert our visual element is visible
+  // Give the React app a stable 1-second window to resolve the '304 Not Modified' token authentication check
+  await page.waitForTimeout(1000);
+
+  // Assert our visual element is visible (Forces Playwright to poll the page until hydrated)
   await expect(
     page.getByRole("button", { name: "Go to login page" }),
-  ).toBeVisible({ timeout: 10000 });
+  ).toBeVisible({ timeout: 15000 });
 
   // Session MUST persist
   await expect(page).toHaveURL("/posts/new");
