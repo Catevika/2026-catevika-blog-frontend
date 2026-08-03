@@ -38,7 +38,7 @@ jobs:
       # The trailing '&' launches the command as a detached background worker process!
       - name: Clone and run Express Backend companion server
         run: |
-          git clone https://${{ secrets.BACKEND_TOKEN }}@://github.com backend-server
+          git clone https://${{ secrets.BACKEND_TOKEN }}@github.com/Catevika/2026-blog-app-backend.git backend-server
           cd backend-server
           
           echo "📦 Installing backend dependencies..."
