@@ -37,7 +37,7 @@ jobs:
       # 🚀 STEP C: Clone and execute your Express Backend directly inside the workflow shell
       - name: Clone and run Express Backend companion server
         run: |
-          git clone https://x-token-auth:${{ secrets.BACKEND_TOKEN }}@://github.com backend-server
+          git clone https://x-token-auth:${{ secrets.BACKEND_TOKEN }}@github.com/Catevika/2026-blog-app-backend.git backend-server
           cd backend-server
           
           echo "📦 Installing backend dependencies..."
