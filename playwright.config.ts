@@ -19,6 +19,10 @@ export default defineConfig({
 
   preserveOutput: "failures-only",
 
+  expect: {
+    timeout: 15000, // Bumps expectation limits from 5s to 15s for slow cloud handshakes
+  },
+
   use: {
     baseURL: "http://127.0.0.1:4173",
     trace: "on",
