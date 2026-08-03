@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { loginUI, submitFormSafely, uniqueSuffix } from "../helpers";
+import {
+  loginUI,
+  submitFormSafely,
+  uniqueSuffix,
+  resolveLoggedInUserId,
+} from "../helpers";
 
 const ID_REGEX = /\/posts\/[0-9a-f]{24}$/;
 
@@ -94,10 +99,11 @@ test("desktop: user can edit a comment", async ({ page }) => {
   );
   await expect(updatedText).toBeVisible();
 
+  // 🚀 Playwright Best Practice: Wait for all background requests to settle
+  await page.waitForLoadState("networkidle");
+
   // 11. Backend validation
-  const meResponse = await page.request.get("/api/auth/me");
-  const me = await meResponse.json();
-  const testUserId = me.user.id;
+  const testUserId = await resolveLoggedInUserId(page);
 
   const treeResponse = await page.request.get(
     `/api/posts/${postId}/comments/tree?userId=${testUserId}`,

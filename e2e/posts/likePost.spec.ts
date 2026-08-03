@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { loginUI, submitFormSafely, uniqueSuffix } from "../helpers";
+import {
+  loginUI,
+  submitFormSafely,
+  uniqueSuffix,
+  resolveLoggedInUserId,
+} from "../helpers";
 
 const ID_REGEX = /\/posts\/[0-9a-f]{24}$/;
 
@@ -83,18 +88,18 @@ test("a non-author user can like and unlike a post", async ({ page }) => {
   //
   await expect(likeCount).toHaveText("1");
 
+  await page.waitForLoadState("networkidle");
+
   //
   // 11. Backend validation
   //
-  const meResponse = await page.request.get("/api/auth/me");
-  const me = await meResponse.json();
-  const testUserId = me.user.id; // FIXED
+  const testUserId = await resolveLoggedInUserId(page);
 
   const singleResponse = await page.request.get(`/api/posts/${postId}`);
   const singlePost = await singleResponse.json();
 
   expect(singlePost.likeCount).toBe(1);
-  expect(singlePost.likedBy).toContain(testUserId); // FIXED
+  expect(singlePost.likedBy).toContain(testUserId);
 
   //
   // 12. Unlike the post
@@ -113,6 +118,8 @@ test("a non-author user can like and unlike a post", async ({ page }) => {
   // 13. UI should show likeCount = 0
   //
   await expect(likeCount).toHaveText("0");
+
+  await page.waitForLoadState("networkidle");
 
   //
   // 14. Backend validation
