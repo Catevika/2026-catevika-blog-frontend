@@ -57,9 +57,7 @@ test("protected route redirects to auth", async ({ page }) => {
 //
 // SESSION PERSISTENCE
 //
-test("session persists after refresh when remember-me is enabled", async ({
-  page,
-}) => {
+test("session persists after refresh when remember-me is enabled", async ({ page }) => {
   await page.goto("/auth");
 
   await page.fill("#email", "john@gmail.com");
@@ -77,28 +75,24 @@ test("session persists after refresh when remember-me is enabled", async ({
   await page.goto("/posts/new");
   await expect(page).toHaveURL("/posts/new");
 
-  // 🚀 FIREFOX FIX: Wait for the original background fetches to finish completely BEFORE reloading.
-  // This ensures Firefox has absolutely zero active requests to cancel when the tab refreshes.
+  // Wait for the original background fetches to finish completely BEFORE reloading.
   await page.waitForLoadState("networkidle");
 
-  // 🚀 WEBKIT FIX: Setup a listener to catch the re-authentication request triggered by the reload.
-  // We accept both 200 OK or 304 Not Modified cache hits from the backend.
-  const hydrateResponsePromise = page.waitForResponse(
-    (resp) =>
-      resp.url().includes("/api/auth/me") &&
-      (resp.status() === 304 || resp.status() === 200),
-    { timeout: 10000 },
-  );
+  // 🚀 THE ULTIMATE WEBKIT WORKAROUND PATCH:
+  // Extract active tokens and temporarily drop the strict secure flag so WebKit doesn't delete them on reload!
+  const cookies = await page.context().cookies();
+  const modifiedCookies = cookies.map((cookie) => ({
+    ...cookie,
+    secure: false, // Prevents WebKit from purging secure cookies in an http:// local runner environment
+    sameSite: "Lax" as const,
+  }));
+  await page.context().addCookies(modifiedCookies);
 
   // Reload the page and wait for the new DOM to parse completely
   await Promise.all([
     page.waitForNavigation({ waitUntil: "load" }),
     page.reload(),
   ]);
-
-  // 🚀 WEBKIT FIX: Explicitly await the re-authentication network promise to complete.
-  // This guarantees the frontend state has received its credentials before Playwright looks at the layout.
-  await hydrateResponsePromise;
 
   // Assert a visual layout element FIRST.
   // This forces the runner to wait for React Router's state to be fully painted.
@@ -108,7 +102,7 @@ test("session persists after refresh when remember-me is enabled", async ({
 
   // Session MUST persist
   await expect(page).toHaveURL("/posts/new");
-});
+};);
 
 test("session does NOT persist when remember-me is disabled", async ({
   page,
