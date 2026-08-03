@@ -57,7 +57,9 @@ test("protected route redirects to auth", async ({ page }) => {
 //
 // SESSION PERSISTENCE
 //
-test("session persists after refresh when remember-me is enabled", async ({ page }) => {
+test("session persists after refresh when remember-me is enabled", async ({
+  page,
+}) => {
   await page.goto("/auth");
 
   await page.fill("#email", "john@gmail.com");
@@ -102,7 +104,7 @@ test("session persists after refresh when remember-me is enabled", async ({ page
 
   // Session MUST persist
   await expect(page).toHaveURL("/posts/new");
-};);
+});
 
 test("session does NOT persist when remember-me is disabled", async ({
   page,
