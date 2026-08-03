@@ -101,7 +101,7 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}
         env:
-          VITE_API_URL: https://onrender.com
+          VITE_API_URL: https://two026-blog-app-backend.onrender.com
           VERCEL_TELEMETRY_DISABLED: 1
 
       - name: Deploy prebuilt artifacts to Vercel
