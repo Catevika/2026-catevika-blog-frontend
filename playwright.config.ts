@@ -35,7 +35,21 @@ export default defineConfig({
   // 🚀 THE PRO CROSS-BROWSER MATRIX
   projects: [
     { name: "chromium", use: { browserName: "chromium" } },
-    { name: "firefox", use: { browserName: "firefox" } },
+    {
+      name: "firefox",
+      use: {
+        browserName: "firefox",
+        // Force Firefox to allow cross-origin loopback cookies during the local test suite
+        launchOptions: {
+          firefoxUserPrefs: {
+            "network.cookie.sameSite.laxByDefault": false,
+            "network.cookie.sameSite.noneRequiresSecure": false,
+            "privacy.firstparty.isolate": false,
+            "privacy.partition.network_state": false,
+          },
+        },
+      },
+    },
     { name: "webkit", use: { browserName: "webkit" } },
   ],
 
