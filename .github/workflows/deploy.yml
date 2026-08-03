@@ -38,7 +38,7 @@ jobs:
       # The trailing '&' launches the command as a detached background worker process!
       - name: Clone and run Express Backend server locally
         run: |
-          git clone https://github.com backend-server
+          git clone https://github.com/Catevika/2026-blog-app-backend.git backend-server
           cd backend-server
           npm ci
           NODE_ENV=production PORT=4000 MONGO_URI="${{ secrets.MONGO_URI }}" ACCESS_TOKEN_SECRET="${{ secrets.ACCESS_TOKEN_SECRET }}" REFRESH_TOKEN_SECRET="${{ secrets.REFRESH_TOKEN_SECRET }}" npm start &
