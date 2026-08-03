@@ -69,8 +69,19 @@ test("user can soft-delete a post", async ({ page }) => {
     page.getByRole("link", { name: new RegExp(title) }),
   ).toBeVisible();
 
-  // 8. Now backend state is guaranteed fresh
-  const trashResponse = await page.request.get("/api/posts/trash/list");
+  await page.waitForLoadState("networkidle");
+
+  // 8. Backend validation with shared Browser Context cookies
+  const cookies = await page.context().cookies();
+  const cookieHeader = cookies.map((c) => `${c.name}=${c.value}`).join("; ");
+
+  const trashResponse = await page.request.get("/api/posts/trash/list", {
+    headers: {
+      Cookie: cookieHeader, // manually set the cookies in the request header to avoid 401 Unauthorized
+    },
+  });
+
+  expect(trashResponse.status()).toBe(200);
   const trashList = await trashResponse.json();
 
   expect(JSON.stringify(trashList)).toContain(postId);
