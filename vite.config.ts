@@ -16,9 +16,7 @@ export default defineConfig(({ mode }) => {
     process.env.TEST_RATE_LIMITER = "false";
   }
 
-  const apiTarget = process.env.CI
-    ? "https://two026-blog-app-backend.onrender.com"
-    : "http://localhost:4000";
+  const apiTarget = "http://127.0.0.1:4000";
 
   const proxyConfig = {
     "/api": {

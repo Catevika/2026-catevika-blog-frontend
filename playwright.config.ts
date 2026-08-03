@@ -1,27 +1,28 @@
 /// <reference types="node" />
 import { defineConfig } from "@playwright/test";
+import path from "node:path";
 
 export default defineConfig({
   testDir: "./e2e",
+  globalSetup: path.resolve("./e2e/global-setup.ts"),
 
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
 
   retries: 0,
-  maxFailures: process.env.CI ? 1 : undefined, // Stop at 1st failure to save time
-
+  maxFailures: process.env.CI ? 1 : undefined,
   workers: process.env.CI ? 1 : undefined,
   timeout: 60_000,
+
+  expect: {
+    timeout: 10000, // Reduced from 15s because local requests resolve in <5ms
+  },
 
   reporter: process.env.CI
     ? [["github"], ["line"], ["html", { open: "never" }]]
     : [["list"], ["html"]],
 
   preserveOutput: "failures-only",
-
-  expect: {
-    timeout: 15000, // Bumps expectation limits from 5s to 15s for slow cloud handshakes
-  },
 
   use: {
     baseURL: "http://127.0.0.1:4173",
@@ -31,21 +32,11 @@ export default defineConfig({
     navigationTimeout: 20000,
   },
 
+  // 🚀 THE PRO CROSS-BROWSER MATRIX
   projects: [
-    {
-      name: "chromium",
-      use: {
-        browserName: "chromium",
-        launchOptions: {
-          args: [
-            "--disable-web-security",
-            "--disable-features=IsolateOrigins,site-per-process",
-            "--allow-running-insecure-content",
-            "--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1:4173",
-          ],
-        },
-      },
-    },
+    { name: "chromium", use: { browserName: "chromium" } },
+    { name: "firefox", use: { browserName: "firefox" } },
+    { name: "webkit", use: { browserName: "webkit" } },
   ],
 
   webServer: {

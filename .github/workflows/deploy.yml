@@ -14,13 +14,12 @@ jobs:
       statuses: write
       pull-requests: write
       
-    # 🚀 GLOBAL ENVIRONMENT VARIABLES: Available for all steps (Build, Tests, and Deploy)
     env:
-      VITE_API_URL: https://onrender.com
+      VITE_API_URL: http://127.0.0.1:4000
       VITE_PEXELS_API_KEY: ${{ secrets.VERCEL_PEXELS_API_KEY }}
 
     steps:
-      - name: Checkout repository code
+      - name: Checkout Frontend repository code
         uses: actions/checkout@v6.0.3
 
       - name: Setup Node.js environment
@@ -29,22 +28,34 @@ jobs:
           node-version: '24.18.0'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install Frontend dependencies
         run: npm ci
 
-      - name: Install Playwright browsers
+      - name: Install Playwright multi-browsers
         run: npx playwright install --with-deps
 
-      # Vite compiler compiles code with zero runtime console errors
+      # 🚀 STEP C: Clone and execute your Express Backend directly inside the workflow shell
+      # The trailing '&' launches the command as a detached background worker process!
+      - name: Clone and run Express Backend server locally
+        run: |
+          git clone https://github.com backend-server
+          cd backend-server
+          npm ci
+          NODE_ENV=production PORT=4000 MONGO_URI="${{ secrets.MONGO_URI }}" ACCESS_TOKEN_SECRET="${{ secrets.ACCESS_TOKEN_SECRET }}" REFRESH_TOKEN_SECRET="${{ secrets.REFRESH_TOKEN_SECRET }}" npm start &
+          
+          echo "⏳ Waiting for local backend server loop to bind on port 4000..."
+          npx wait-on http://127.0.0 --timeout 30000
+          echo "✅ Local Backend is active and connected to MongoDB!"
+
       - name: Build Vite application for E2E testing
         run: npm run build
 
-      - name: Run Playwright E2E tests
+      - name: Run Playwright cross-browser tests (Chromium, Firefox, WebKit)
         run: npm run test:e2e
         env:
           CI: true 
 
-      - name: Upload Playwright report artifact
+      - name: Upload Playwright matrix report artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -86,6 +97,7 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_API_URL: https://two026-blog-app-backend.onrender.com # Production URL for Vercel users
 
       - name: Deploy prebuilt artifacts to Vercel
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
