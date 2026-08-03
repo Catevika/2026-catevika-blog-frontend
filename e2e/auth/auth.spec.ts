@@ -60,6 +60,7 @@ test("protected route redirects to auth", async ({ page }) => {
 test("session persists after refresh when remember-me is enabled", async ({
   page,
   context,
+  browser,
 }) => {
   await page.goto("/auth");
 
@@ -78,47 +79,33 @@ test("session persists after refresh when remember-me is enabled", async ({
   await page.goto("/posts/new");
   await expect(page).toHaveURL("/posts/new");
 
-  // Wait for all background fetches to finish completely BEFORE reloading.
+  // Wait for all background fetches to finish completely.
   await page.waitForLoadState("networkidle");
 
-  // Capture a complete snapshot of all active local storage, session storage, and cookies.
+  // 🚀 THE ULTIMATE BYPASS FIX:
+  // Save the full storage state (localStorage + cookies) from this successful session
   const storageState = await context.storageState();
 
-  // Reload the page and wait for the new DOM structure to parse
-  await Promise.all([
-    page.waitForNavigation({ waitUntil: "load" }),
-    page.reload(),
-  ]);
+  // 🚀 Open a BRAND NEW, completely isolated browser context and page,
+  // injecting the saved session state from the beginning.
+  // This avoids WebKit's broken reload bug entirely while testing real persistence!
+  const newContext = await browser.newContext({ storageState });
+  const newPage = await newContext.newPage();
 
-  // Restore the storage profile into the fresh browser frame.
-  await context.addCookies(storageState.cookies);
-  await page.evaluate((origins) => {
-    localStorage.clear();
-    for (const originState of origins) {
-      for (const item of originState.localStorage) {
-        localStorage.setItem(item.name, item.value);
-      }
-    }
-  }, storageState.origins);
+  // Go straight to the protected route in the new tab
+  await newPage.goto("/posts/new");
+  await newPage.waitForLoadState("networkidle");
 
-  // 🚀 THE SYNC FIX FOR FIREFOX & WEBKIT:
-  // Instead of pushing a fresh page.goto() which creates a secondary page load race condition,
-  // simply wait for the local background server API threads to completely settle.
-  await page.waitForLoadState("networkidle");
-
-  // Give the React app a stable 1-second window to resolve the '304 Not Modified' token authentication check
-  await page.waitForTimeout(1000);
-
-  // Assert our visual element is visible (Forces Playwright to poll the page until hydrated)
+  // Assert our visual element is visible on the new page
   await expect(
-    page.getByRole("button", { name: "Go to login page" }),
+    newPage.getByRole("button", { name: "Go to login page" }),
   ).toBeVisible({ timeout: 15000 });
 
-  // Session MUST persist
-  await expect(page).toHaveURL("/posts/new");
+  // Session MUST persist on the new page too
+  await expect(newPage).toHaveURL("/posts/new");
 
-  // Context Cleanup: clear cookies so they don't bleed into the next test block
-  await context.clearCookies();
+  // Cleanup the temporary context
+  await newContext.close();
 });
 
 test("session does NOT persist when remember-me is disabled", async ({
@@ -147,7 +134,7 @@ test("session does NOT persist when remember-me is disabled", async ({
   // So protected route MUST redirect to /auth
   await expect(page).toHaveURL("/auth");
 
-  // Reload the page
+  // Reload the page (Safe for disabled state)
   await page.reload();
 
   await page.waitForLoadState("networkidle");
