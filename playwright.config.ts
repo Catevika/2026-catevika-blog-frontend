@@ -31,7 +31,22 @@ export default defineConfig({
     navigationTimeout: 20000,
   },
 
-  projects: [{ name: "chromium", use: { browserName: "chromium" } }],
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        browserName: "chromium",
+        launchOptions: {
+          args: [
+            "--disable-web-security",
+            "--disable-features=IsolateOrigins,site-per-process",
+            "--allow-running-insecure-content",
+            "--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1:4173",
+          ],
+        },
+      },
+    },
+  ],
 
   webServer: {
     command: "npx vite preview --host 127.0.0.1 --port 4173",
