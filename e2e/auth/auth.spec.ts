@@ -77,10 +77,18 @@ test("session persists after refresh when remember-me is enabled", async ({
   await page.goto("/posts/new");
   await expect(page).toHaveURL("/posts/new");
 
-  // 🚀 FIREFOX PATCH - STEP 1:
-  // Wait for the original background fetches to finish completely BEFORE reloading.
+  // 🚀 FIREFOX FIX: Wait for the original background fetches to finish completely BEFORE reloading.
   // This ensures Firefox has absolutely zero active requests to cancel when the tab refreshes.
   await page.waitForLoadState("networkidle");
+
+  // 🚀 WEBKIT FIX: Setup a listener to catch the re-authentication request triggered by the reload.
+  // We accept both 200 OK or 304 Not Modified cache hits from the backend.
+  const hydrateResponsePromise = page.waitForResponse(
+    (resp) =>
+      resp.url().includes("/api/auth/me") &&
+      (resp.status() === 304 || resp.status() === 200),
+    { timeout: 10000 },
+  );
 
   // Reload the page and wait for the new DOM to parse completely
   await Promise.all([
@@ -88,11 +96,11 @@ test("session persists after refresh when remember-me is enabled", async ({
     page.reload(),
   ]);
 
-  // 🚀 FIREFOX PATCH - STEP 2:
-  // Give React 1.5 seconds to safely process the '304 Not Modified' cache response and hydrate the UI
-  await page.waitForTimeout(1500);
+  // 🚀 WEBKIT FIX: Explicitly await the re-authentication network promise to complete.
+  // This guarantees the frontend state has received its credentials before Playwright looks at the layout.
+  await hydrateResponsePromise;
 
-  // Playwright Best Practice: Assert a visual layout element FIRST.
+  // Assert a visual layout element FIRST.
   // This forces the runner to wait for React Router's state to be fully painted.
   await expect(
     page.getByRole("button", { name: "Go to login page" }),
