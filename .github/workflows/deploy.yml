@@ -38,7 +38,7 @@ jobs:
       # The trailing '&' launches the command as a detached background worker process!
       - name: Clone and run Express Backend companion server
         run: |
-          git clone https://${{ secrets.BACKEND_TOKEN }}@github.com/Catevika/2026-blog-app-backend.git backend-server
+          git clone https://${{ secrets.BACKEND_TOKEN }}@://github.com backend-server
           cd backend-server
           
           echo "📦 Installing backend dependencies..."
@@ -91,26 +91,19 @@ jobs:
       - name: Pull Vercel environment configurations
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          echo "🔄 Validating credentials and pulling environment from Vercel..."
-          if ! vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}; then
+          echo "🔄 Validating credentials and linking environment to Vercel..."
+          # 🚀 THE ULTIMATE HANDSHAKE FIX: Injecting --org and --project directly as command line options
+          if ! vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} --org=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}; then
             echo "❌ Error: Vercel authentication failed!"
             exit 1
           fi
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build production artifacts for Vercel
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }} --org=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}
         env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VITE_API_URL: https://two026-blog-app-backend.onrender.com # Production URL for Vercel users
+          VITE_API_URL: https://onrender.com # Production URL for Vercel users
 
       - name: Deploy prebuilt artifacts to Vercel
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --org=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}
