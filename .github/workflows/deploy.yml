@@ -38,10 +38,17 @@ jobs:
       # The trailing '&' launches the command as a detached background worker process!
       - name: Clone and run Express Backend companion server
         run: |
-          # 🚀 FIX: Streamlined Classic Token format (removes syntax prefix errors)
-          git clone https://${{ secrets.BACKEND_TOKEN }}@github.com/Catevika/2026-blog-app-backend.git backend-server
+          git clone https://${{ secrets.BACKEND_TOKEN }}@://github.com backend-server
           cd backend-server
+          
+          echo "📦 Installing backend dependencies..."
           npm ci
+          
+          # 🚀 THE COMPILATION FIX: Compile TypeScript into the 'dist' folder before booting
+          echo "🏗️ Building backend TypeScript source code..."
+          npm run build
+          
+          echo "🚀 Launching companion backend server in the background..."
           NODE_ENV=production PORT=4000 MONGO_URI="${{ secrets.MONGO_URI }}" ACCESS_TOKEN_SECRET="${{ secrets.ACCESS_TOKEN_SECRET }}" REFRESH_TOKEN_SECRET="${{ secrets.REFRESH_TOKEN_SECRET }}" npm start &
           
           echo "⏳ Waiting for local backend server loop to bind on port 4000..."
