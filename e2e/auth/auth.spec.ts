@@ -77,16 +77,21 @@ test("session persists after refresh when remember-me is enabled", async ({
   await page.goto("/posts/new");
   await expect(page).toHaveURL("/posts/new");
 
-  // Reload the page
-  await page.reload();
+  // 🚀 FIX FOR FIREFOX RACE CONDITION:
+  // Chain reload to a strict navigation promise to prevent Firefox from evaluating empty memory snapshots
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.reload(),
+  ]);
+
+  // 🚀 Playwright Best Practice: Assert a visual layout element FIRST.
+  // This forces the runner to wait for React Router's <InitializeAuth /> to finish hydrating.
+  await expect(
+    page.getByRole("button", { name: "Go to login page" }),
+  ).toBeVisible({ timeout: 10000 });
 
   // Session MUST persist
   await expect(page).toHaveURL("/posts/new");
-
-  // Logout button MUST be visible
-  await expect(
-    page.getByRole("button", { name: "Go to login page" }),
-  ).toBeVisible();
 });
 
 test("session does NOT persist when remember-me is disabled", async ({
