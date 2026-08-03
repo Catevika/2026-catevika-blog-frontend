@@ -16,13 +16,12 @@ jobs:
       
     # 🚀 GLOBAL ENVIRONMENT VARIABLES: Available for all steps (Build, Tests, and Deploy)
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      VITE_API_URL: https://two026-blog-app-backend.onrender.com
+      VITE_API_URL: https://onrender.com
       VITE_PEXELS_API_KEY: ${{ secrets.VERCEL_PEXELS_API_KEY }}
 
     steps:
       - name: Checkout repository code
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6.0.3
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.1.0
@@ -36,7 +35,7 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-      # Vite will now successfully read both global variables at compile time!
+      # Vite compiler compiles code with zero runtime console errors
       - name: Build Vite application for E2E testing
         run: npm run build
 
@@ -94,4 +93,3 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          

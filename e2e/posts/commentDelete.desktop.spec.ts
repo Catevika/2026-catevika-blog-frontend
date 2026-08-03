@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { loginUI, submitFormSafely, uniqueSuffix } from "../helpers";
+import {
+  loginUI,
+  resolveLoggedInUserId,
+  submitFormSafely,
+  uniqueSuffix,
+} from "../helpers";
 
 const ID_REGEX = /\/posts\/[0-9a-f]{24}$/;
 
@@ -66,12 +71,13 @@ test("desktop: user can soft delete a comment", async ({ page }) => {
 
   // 9. Assert the comment is removed from DOM
   await expect(commentArticle).not.toBeVisible();
+  await page.waitForLoadState("networkidle");
 
   // 10. Backend validation
-  const meResponse = await page.request.get("/api/auth/me");
-  const me = await meResponse.json();
-  const testUserId = me.user.id;
+  // Use your robust helper that safely parses localStorage session states
+  const testUserId = await resolveLoggedInUserId(page);
 
+  // Directly call the network verification step using the verified ID string
   const treeResponse = await page.request.get(
     `/api/posts/${postId}/comments/tree?userId=${testUserId}`,
   );
