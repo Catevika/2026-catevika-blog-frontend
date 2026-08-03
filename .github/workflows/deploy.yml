@@ -38,7 +38,7 @@ jobs:
       # The trailing '&' launches the command as a detached background worker process!
       - name: Clone and run Express Backend companion server
         run: |
-          git clone https://${{ secrets.BACKEND_TOKEN }}@github.com/Catevika/2026-blog-app-backend.git backend-server
+          git clone https://x-token-auth:${{ secrets.BACKEND_TOKEN }}@github.com/Catevika/2026-blog-app-backend.git backend-server
           cd backend-server
           
           echo "📦 Installing backend dependencies..."
@@ -48,11 +48,9 @@ jobs:
           npm run build
           
           echo "🚀 Launching companion backend server on unified IPv4 host..."
-          # 🚀 FIX: Pass HOST=0.0.0.0 to force Express onto the clean universal loopback
           NODE_ENV=production PORT=4000 HOST=0.0.0.0 MONGO_URI="${{ secrets.MONGO_URI }}" ACCESS_TOKEN_SECRET="${{ secrets.ACCESS_TOKEN_SECRET }}" REFRESH_TOKEN_SECRET="${{ secrets.REFRESH_TOKEN_SECRET }}" npm start &
           
           echo "⏳ Waiting for local backend server loop to bind on port 4000..."
-          # 🚀 FIX: Query 'localhost' instead of '127.0.0.1' to match Node 24 alignment rules
           npx wait-on http://localhost:4000/api/health --timeout 30000
           echo "✅ Local Companion Backend is active and connected to MongoDB!"
 
@@ -92,21 +90,23 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           echo "🔄 Validating credentials and linking environment to Vercel..."
-          # 🚀 THE CORRECT VERCEL PULL SYNTAX: Uses --scope and --project to clear the gate
-          if ! vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}; then
+          # 🚀 FIX: Replace --scope with --team to route the auth token correctly
+          if ! vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} --team=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}; then
             echo "❌ Error: Vercel authentication failed!"
             exit 1
           fi
+        env:
+          VERCEL_TELEMETRY_DISABLED: 1
 
       - name: Build production artifacts for Vercel
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        # 🚀 Fix build step options to match standard scope syntax too
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }} --team=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}
         env:
-          VITE_API_URL: https://onrender.com # Production URL for Vercel users
+          VITE_API_URL: https://two026-blog-app-backend.onrender.com
+          VERCEL_TELEMETRY_DISABLED: 1
 
       - name: Deploy prebuilt artifacts to Vercel
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        # 🚀 Fix deploy step options to match standard scope syntax too
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}
-      
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --team=${{ secrets.VERCEL_ORG_ID }} --project=${{ secrets.VERCEL_PROJECT_ID }}
+        env:
+          VERCEL_TELEMETRY_DISABLED: 1
