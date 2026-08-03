@@ -51,7 +51,19 @@ export default defineConfig({
     },
 
     // 🚀 Clean & default for WebKit
-    { name: "webkit", use: { browserName: "webkit" } },
+    {
+      name: "webkit",
+      use: {
+        browserName: "webkit",
+        launchOptions: {
+          args: [
+            "--no-sandbox",
+            "--disable-features=SameSiteByDefaultCookies",
+            "--disable-features=CookiesWithoutSameSiteMustBeSecure",
+          ],
+        },
+      },
+    },
   ],
 
   webServer: {
