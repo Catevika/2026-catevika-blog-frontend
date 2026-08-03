@@ -115,6 +115,8 @@ test("session does NOT persist when remember-me is disabled", async ({
   // Reload the page
   await page.reload();
 
+  await page.waitForLoadState("networkidle");
+
   // Still logged out
   await expect(page).toHaveURL("/auth");
 });

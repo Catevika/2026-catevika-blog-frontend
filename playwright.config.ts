@@ -1,10 +1,8 @@
 /// <reference types="node" />
 import { defineConfig } from "@playwright/test";
-import path from "node:path";
 
 export default defineConfig({
   testDir: "./e2e",
-  globalSetup: path.resolve("./e2e/global-setup.ts"),
 
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
@@ -15,7 +13,7 @@ export default defineConfig({
   timeout: 60_000,
 
   expect: {
-    timeout: 10000, // Reduced from 15s because local requests resolve in <5ms
+    timeout: 10000,
   },
 
   reporter: process.env.CI
@@ -32,14 +30,15 @@ export default defineConfig({
     navigationTimeout: 20000,
   },
 
-  // 🚀 THE PRO CROSS-BROWSER MATRIX
   projects: [
+    // 🚀 Clean & default for Chromium
     { name: "chromium", use: { browserName: "chromium" } },
+
+    // 🚀 Custom cookie isolation patch dedicated ONLY to Firefox
     {
       name: "firefox",
       use: {
         browserName: "firefox",
-        // Force Firefox to allow cross-origin loopback cookies during the local test suite
         launchOptions: {
           firefoxUserPrefs: {
             "network.cookie.sameSite.laxByDefault": false,
@@ -50,6 +49,8 @@ export default defineConfig({
         },
       },
     },
+
+    // 🚀 Clean & default for WebKit
     { name: "webkit", use: { browserName: "webkit" } },
   ],
 
