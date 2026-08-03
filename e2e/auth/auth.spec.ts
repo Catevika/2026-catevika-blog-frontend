@@ -77,15 +77,23 @@ test("session persists after refresh when remember-me is enabled", async ({
   await page.goto("/posts/new");
   await expect(page).toHaveURL("/posts/new");
 
-  // 🚀 FIX FOR FIREFOX RACE CONDITION:
-  // Chain reload to a strict navigation promise to prevent Firefox from evaluating empty memory snapshots
+  // 🚀 FIREFOX PATCH - STEP 1:
+  // Wait for the original background fetches to finish completely BEFORE reloading.
+  // This ensures Firefox has absolutely zero active requests to cancel when the tab refreshes.
+  await page.waitForLoadState("networkidle");
+
+  // Reload the page and wait for the new DOM to parse completely
   await Promise.all([
-    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.waitForNavigation({ waitUntil: "load" }),
     page.reload(),
   ]);
 
-  // 🚀 Playwright Best Practice: Assert a visual layout element FIRST.
-  // This forces the runner to wait for React Router's <InitializeAuth /> to finish hydrating.
+  // 🚀 FIREFOX PATCH - STEP 2:
+  // Give React 1.5 seconds to safely process the '304 Not Modified' cache response and hydrate the UI
+  await page.waitForTimeout(1500);
+
+  // Playwright Best Practice: Assert a visual layout element FIRST.
+  // This forces the runner to wait for React Router's state to be fully painted.
   await expect(
     page.getByRole("button", { name: "Go to login page" }),
   ).toBeVisible({ timeout: 10000 });
