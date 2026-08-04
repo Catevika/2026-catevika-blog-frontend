@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://two026-blog-app-backend.onrender.com"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
