@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://two026-blog-app-backend.onrender.com*"
+      "destination": "https://onrender.com*"
     },
     {
       "source": "/((?!api).*)",
@@ -10,4 +10,3 @@
     }
   ]
 }
-
