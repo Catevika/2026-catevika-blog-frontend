@@ -9,6 +9,7 @@ import type { EventEmitter } from "node:events";
 
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test";
+  const isProduction = mode === "production";
 
   // Inject environment variables for Playwright + Vitest
   if (isTest) {
@@ -16,7 +17,9 @@ export default defineConfig(({ mode }) => {
     process.env.TEST_RATE_LIMITER = "false";
   }
 
-  const apiTarget = "http://127.0.0.1:4000";
+  const apiTarget = isProduction
+    ? "https://two026-blog-app-backend.onrender.com"
+    : "http://127.0.0.1:4000";
 
   const proxyConfig = {
     "/api": {
