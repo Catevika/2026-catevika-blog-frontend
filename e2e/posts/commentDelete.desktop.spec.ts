@@ -62,22 +62,38 @@ test("desktop: user can soft delete a comment", async ({ page }) => {
 
   await expect(commentArticle).toBeVisible();
 
+  // e2e/posts/commentDelete.desktop.spec.ts
+
+  // ... [Keep everything exactly the same up to Step 8] ...
+
   // 8. Click delete button
   const deleteButton = commentArticle.locator("footer button").nth(2);
   await deleteButton.click();
 
+  // 🚀 FIX: Intercept the real network DELETE request before asserting anything else
+  const deleteResponsePromise = page.waitForResponse(
+    (resp) =>
+      resp.url().includes(`/api/posts/${postId}/comments`) &&
+      resp.request().method() === "DELETE" &&
+      resp.status() === 200,
+    { timeout: 10000 },
+  );
+
   // Confirm delete modal
   await page.getByRole("button", { name: "Delete" }).click();
 
+  // 🚀 FIX: Wait for the backend server to finish deleting and return a 200 OK status
+  await deleteResponsePromise;
+
   // 9. Assert the comment is removed from DOM
   await expect(commentArticle).not.toBeVisible();
-  await page.waitForLoadState("networkidle");
+
+  // Give the background worker a tiny 500ms safety window to fully flush the write cache
+  await page.waitForTimeout(500);
 
   // 10. Backend validation
-  // Use your robust helper that safely parses localStorage session states
   const testUserId = await resolveLoggedInUserId(page);
 
-  // Directly call the network verification step using the verified ID string
   const treeResponse = await page.request.get(
     `/api/posts/${postId}/comments/tree?userId=${testUserId}`,
   );

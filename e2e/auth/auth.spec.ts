@@ -1,4 +1,3 @@
-// e2e/auth.spec.ts
 import { test, expect } from "@playwright/test";
 import { login } from "../helpers";
 

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { defineConfig } from "vitest/config";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
@@ -9,7 +10,10 @@ import type { EventEmitter } from "node:events";
 
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test";
-  const isProduction = mode === "production";
+
+  // 🚀 THE ENVIRONMENT MATRIX FIX:
+  // Detect if the code is compiling inside an automated CI runner (GitHub Actions)
+  const isCI = process.env.CI === "true";
 
   // Inject environment variables for Playwright + Vitest
   if (isTest) {
@@ -17,9 +21,13 @@ export default defineConfig(({ mode }) => {
     process.env.TEST_RATE_LIMITER = "false";
   }
 
-  const apiTarget = isProduction
-    ? "https://two026-blog-app-backend.onrender.com"
-    : "http://127.0.0.1:4000";
+  // 🚀 THE LOGICAL OVERWRITE:
+  // Only route traffic to your live Render server during the real public build for Vercel users.
+  // During local development or active testing cycles (isCI), stay locked onto the local port 4000.
+  const apiTarget =
+    mode === "production" && !isCI
+      ? "https://two026-blog-app-backend.onrender.com"
+      : "http://127.0.0.1:4000";
 
   const proxyConfig = {
     "/api": {
