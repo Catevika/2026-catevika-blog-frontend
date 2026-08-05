@@ -1,13 +1,19 @@
 import type { ComponentProps } from "react";
 
 const MarkdownImage = ({ src, alt, ...props }: ComponentProps<"img">) => {
-  // If the preview wrapper injects a blob URL, it will be a valid src.
-  // If the markdown contains a placeholder (upload-1234), the preview wrapper
-  // will already have replaced it with a real URL before this component renders.
+  let finalSrc = src;
+
+  if (
+    src &&
+    src.includes("res.cloudinary.com") &&
+    src.includes("/image/upload/")
+  ) {
+    finalSrc = src.replace("/image/upload/", "/image/upload/f_auto,q_auto/");
+  }
 
   return (
     <img
-      src={src}
+      src={finalSrc}
       alt={alt ?? ""}
       className="my-2 h-auto max-h-50 max-w-full rounded-md object-cover md:max-h-100"
       style={{
@@ -19,7 +25,7 @@ const MarkdownImage = ({ src, alt, ...props }: ComponentProps<"img">) => {
       decoding="async"
       {...props}
       onError={(e) => {
-        // Hide broken images (e.g., if upload failed or URL invalid)
+        console.warn(`MarkdownImage failed to load asset resource: ${src}`);
         e.currentTarget.style.display = "none";
       }}
     />

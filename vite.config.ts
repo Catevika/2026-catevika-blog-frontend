@@ -27,7 +27,9 @@ export default defineConfig(({ mode }) => {
   const apiTarget =
     mode === "production" && !isCI
       ? "https://two026-blog-app-backend.onrender.com"
-      : "http://127.0.0.1:4000";
+      : isCI
+        ? "http://127.0.0.1:4000"
+        : "http://localhost:4000";
 
   const proxyConfig = {
     "/api": {

@@ -46,6 +46,7 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
+import { sanitizeOptions } from "@/utils/rehypeSanitizeOptions";
 
 const PostForm = forwardRef<PostFormHandle, PostFormProps>(
   function PostForm(props, ref) {
@@ -486,61 +487,7 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(
                   rehypeRaw,
                   rehypeKatex,
                   rehypeSlug,
-                  [
-                    rehypeSanitize,
-                    {
-                      tagNames: [
-                        "p",
-                        "br",
-                        "strong",
-                        "em",
-                        "u",
-                        "s",
-                        "del",
-                        "ins",
-                        "h1",
-                        "h2",
-                        "h3",
-                        "h4",
-                        "h5",
-                        "h6",
-                        "ul",
-                        "ol",
-                        "li",
-                        "code",
-                        "pre",
-                        "blockquote",
-                        "q",
-                        "hr",
-                        "table",
-                        "thead",
-                        "tbody",
-                        "tr",
-                        "th",
-                        "td",
-                        "div",
-                        "img",
-                        "figure",
-                        "figcaption",
-                        "span",
-                        "math",
-                        "annotation",
-                        "semantics",
-                      ],
-                      attributes: {
-                        "*": ["className", "style", "id"],
-                        a: ["href", "target", "rel", "title"],
-                        img: ["src", "alt", "width", "height", "loading"],
-                        th: ["colspan", "rowspan", "scope", "abbr"],
-                        td: ["colspan", "rowspan"],
-                        table: ["role"],
-                        span: ["className", "style"],
-                        math: ["*"],
-                        annotation: ["*"],
-                        semantics: ["*"],
-                      },
-                    },
-                  ],
+                  [rehypeSanitize, sanitizeOptions],
                 ],
                 skipHtml: false,
                 components: {

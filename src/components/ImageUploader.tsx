@@ -26,9 +26,15 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     (file: File): string | null => {
       const mime = (file.type || "").toLowerCase();
       if (!mime.startsWith("image/"))
-        return "Only JPG, JPEG and PNG images allowed";
-      if (!(mime === "image/jpeg" || mime === "image/png"))
-        return "Only JPG, JPEG and PNG images allowed";
+        return "Only JPG, JPEG, PNG and WebP images allowed";
+
+      if (!(
+        mime === "image/jpeg" ||
+        mime === "image/png" ||
+        mime === "image/webp"
+      ))
+        return "Only JPG, JPEG, PNG and WebP images allowed";
+
       if (file.size > maxSizeMB * 1024 * 1024)
         return `Max ${maxSizeMB}MB file size exceeded`;
       return null;
@@ -117,7 +123,6 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const insertUploadAndInsert = useCallback(async () => {
     if (!selectedFile || !onInsert) return;
 
-    // Prevent double uploads
     if (uploadingRef.current) return;
     uploadingRef.current = true;
 
@@ -128,24 +133,24 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         return;
       }
 
-      // Upload via uploaderApi
+      // 1. Upload the file to Cloudinary
       const resp = await uploaderApi.uploadImage(selectedFile);
 
-      if (resp?.success && resp.data?.url) {
-        let finalUrl = resp.data.url;
-        // Make absolute so editor preview is unambiguous
-        if (finalUrl.startsWith("/")) {
-          finalUrl = `${window.location.origin}${finalUrl}`;
-        }
+      const rawData = resp?.data as Record<string, unknown> | undefined;
+      const finalUrl = (rawData?.secure_url || rawData?.url) as
+        string | undefined;
 
+      if (resp && resp.success && finalUrl) {
         const filename = selectedFile.name.split(".")[0] || "image";
         const markdown = `![${filename}](${finalUrl})`;
 
-        // Call the provided onInsert handler with the real markdown
+        // 2. Send the markdown text up to the parent text editor state
         onInsert(markdown);
+
+        setError(null);
       } else {
         setError("Upload succeeded but no URL returned");
-        console.error("upload response", resp);
+        console.warn("Unexpected response structure :", resp);
       }
     } catch (err) {
       console.error("Upload failed", err);
@@ -206,7 +211,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         >
           <TbPhoto size={24} />
           <span className="mt-2 text-sm font-medium">
-            Upload JPG, JPEG or PNG
+            Upload JPG, JPEG, PNG or WebP
           </span>
           <p className="text-xs text-gray-500">
             Drag to editor or click Insert
@@ -215,7 +220,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png"
+            accept="image/jpeg,image/png,image/webp"
             onChange={handleFileChange}
             className="hidden"
           />
