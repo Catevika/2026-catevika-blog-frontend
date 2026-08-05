@@ -193,7 +193,7 @@ export default function PostList() {
   ------------------------- */
 
   return (
-    <section className="flex w-full flex-col items-center">
+    <section className="mx-auto flex w-full max-w-lg flex-col gap-6 px-4">
       <div className="flex w-full flex-col items-center justify-between pb-2 sm:flex-row sm:justify-between sm:pb-0">
         <TypographyH1>Posts</TypographyH1>
 
@@ -204,7 +204,7 @@ export default function PostList() {
         </div>
       </div>
 
-      <InputGroup className="max-w-2/3">
+      <InputGroup className="max-w-lg">
         <InputGroupInput
           id="search"
           type="search"
@@ -233,7 +233,7 @@ export default function PostList() {
         />
       )}
 
-      <ul>
+      <ul className="mx-auto flex w-full max-w-3xl flex-col gap-4 lg:max-w-4xl">
         {publishedPosts.length > 0 ? (
           publishedPosts.map((post) => (
             <PostListItemEdit key={post.id} post={post} />
@@ -301,14 +301,13 @@ export default function PostList() {
             />
           )}
 
-          <ul className="mt-4">
+          <ul className="mx-auto flex w-full max-w-3xl flex-col gap-4 lg:max-w-4xl">
             {trashedPosts.length > 0 ? (
               trashedPosts.map((post: SerializedPost) => (
                 <li key={post.id} className="flex items-center justify-between">
                   <Link
                     to={`/posts/${post.id}`}
                     aria-label={`Read ${post.title}`}
-                    className="mr-2"
                   >
                     <div className="flex justify-between gap-4">
                       <AuthorForList post={post} />
@@ -320,6 +319,7 @@ export default function PostList() {
                     onClick={() => void handleRestore(post.id)}
                     aria-label={`Restore ${post.title}`}
                     title="Restore from bin"
+                    className="ml-8"
                   >
                     <LiaTrashRestoreAltSolid
                       style={{ height: 24, width: 24 }}

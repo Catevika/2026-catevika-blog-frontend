@@ -111,7 +111,7 @@ export default function Feed() {
   );
 
   return (
-    <section className="flex w-full flex-col items-center">
+    <section className="mx-auto w-full max-w-lg px-4">
       <div className="flex w-full flex-col items-center justify-between pb-2 sm:flex-row sm:justify-between sm:pb-0">
         <TypographyH1>Feed</TypographyH1>
 
@@ -122,7 +122,7 @@ export default function Feed() {
         </div>
       </div>
 
-      <InputGroup className="max-w-2/3">
+      <InputGroup className="max-w-lg">
         <InputGroupInput
           id="search"
           type="search"
@@ -158,10 +158,7 @@ export default function Feed() {
             <li className="opacity-70">Loading...</li>
           ) : feedPosts.length > 0 ? (
             feedPosts.map((post) => (
-              <Card
-                key={post.id}
-                className="w-full min-w-0 overflow-hidden p-4"
-              >
+              <Card key={post.id} className="w-full max-w-full p-4">
                 <li className="w-full min-w-0 overflow-hidden">
                   <header className="w-full overflow-hidden">
                     <div className="mb-4 flex w-full flex-col items-start gap-2 md:flex-row md:flex-nowrap md:items-center md:justify-between md:gap-0">
@@ -190,7 +187,7 @@ export default function Feed() {
                     <AuthorForPost post={post} />
                   </header>
 
-                  <div className="mx-auto w-2xl rounded-lg px-4 py-6">
+                  <div className="mx-auto w-full max-w-3xl rounded-lg lg:max-w-4xl">
                     <PostContent
                       content={post.content}
                       className="w-full max-w-full min-w-0"

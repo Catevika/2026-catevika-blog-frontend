@@ -21,7 +21,7 @@ export default function Trending() {
   const posts = data?.docs ?? [];
 
   return (
-    <section className="flex w-full flex-col items-center">
+    <section className="mx-auto flex w-full max-w-lg flex-col items-center px-4">
       {/* Header */}
       <div className="flex w-full flex-col items-center justify-between pb-2 sm:flex-row sm:justify-between sm:pb-0">
         <TypographyH1>Trending</TypographyH1>
@@ -40,10 +40,10 @@ export default function Trending() {
         data-state={isFetching ? "loading" : "loaded"}
         className="w-full transition-opacity duration-200 data-[state=loaded]:opacity-100 data-[state=loading]:opacity-50"
       >
-        <ul className="mx-auto w-2xl rounded-lg px-4 py-6">
+        <ul className="mx-auto flex w-full max-w-3xl flex-col gap-4 py-6 lg:max-w-4xl">
           {posts.length > 0 ? (
             posts.map((post) => (
-              <Card key={post.id} className="p-4">
+              <Card key={post.id} className="max-w-full p-4">
                 <li>
                   <header>
                     <div className="mb-4 flex flex-col items-center gap-2 md:flex-row md:flex-nowrap md:justify-between md:gap-0">

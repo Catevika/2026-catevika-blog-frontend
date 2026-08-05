@@ -17,7 +17,7 @@ const PostContent = ({ content }: PostContentProps) => {
   return (
     <div
       id="post-content"
-      className="prose-sm prose bg-background dark:bg-card wrap-break-words w-full max-w-none min-w-0 overflow-x-auto rounded-md p-4"
+      className="prose-sm prose bg-background dark:bg-card wrap-break-words w-full max-w-none min-w-0 overflow-x-auto rounded-md"
       data-color-mode={dataColorMode}
     >
       <div className="min-w-0 p-2">
