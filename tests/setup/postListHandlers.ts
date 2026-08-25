@@ -70,12 +70,13 @@ export const postListHandlers = [
       filtered = filtered.filter(
         (p) =>
           p.title.toLowerCase().includes(search) ||
-          p.content.toLowerCase().includes(search),
+          p.content.toLowerCase().includes(search) ||
+          p.author.name.toLowerCase().includes(search) ||
+          p.author.email.toLowerCase().includes(search),
       );
 
     return HttpResponse.json(paginate(filtered, page, limit));
   }),
-
   /* -------------------------
      GET /api/posts/trash/list
   ------------------------- */
@@ -92,7 +93,9 @@ export const postListHandlers = [
       filtered = filtered.filter(
         (p) =>
           p.title.toLowerCase().includes(search) ||
-          p.content.toLowerCase().includes(search),
+          p.content.toLowerCase().includes(search) ||
+          p.author.name.toLowerCase().includes(search) ||
+          p.author.email.toLowerCase().includes(search),
       );
 
     return HttpResponse.json(paginate(filtered, page, limit));

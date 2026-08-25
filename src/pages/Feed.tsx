@@ -92,8 +92,15 @@ export default function Feed() {
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setSearchInput(e.target.value);
+      setSearchParams(
+        (current) => {
+          current.set("page", "1");
+          return current;
+        },
+        { replace: true },
+      );
     },
-    [],
+    [setSearchParams],
   );
 
   const goTo = useCallback(
@@ -126,7 +133,7 @@ export default function Feed() {
         <InputGroupInput
           id="search"
           type="search"
-          placeholder="Search posts..."
+          placeholder="Search posts by author, title or content term..."
           value={searchInput}
           onChange={handleSearchChange}
         />

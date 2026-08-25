@@ -160,4 +160,36 @@ describe("PostList", () => {
       expect(screen.queryByText("Beta Post")).not.toBeInTheDocument(),
     );
   });
+
+  it("filters published posts by author name", async () => {
+    const user = userEvent.setup();
+
+    seedPublished([
+      createPost({ id: "a1", title: "Author Post" }),
+      createPost({
+        id: "b1",
+        title: "Other Post",
+        author: {
+          ...mockUser,
+          id: "u2",
+          name: "Another Author",
+          email: "another@example.com",
+        },
+      }),
+    ]);
+
+    renderWithProvider(
+      <PostList />,
+      "/posts?page=1&inProgressPage=1&deletedPage=1",
+    );
+
+    const searchInput = await screen.findByPlaceholderText(/search/i);
+
+    await user.type(searchInput, "Dominique");
+
+    expect(await screen.findByText("Author Post")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.queryByText("Other Post")).not.toBeInTheDocument(),
+    );
+  });
 });

@@ -62,7 +62,9 @@ export const postFeedHandlers = [
             const q = search.toLowerCase();
             return (
               p.title.toLowerCase().includes(q) ||
-              p.content.toLowerCase().includes(q)
+              p.content.toLowerCase().includes(q) ||
+              p.author.name.toLowerCase().includes(q) ||
+              p.author.email.toLowerCase().includes(q)
             );
           })
         : basePosts;

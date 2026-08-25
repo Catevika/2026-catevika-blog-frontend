@@ -32,7 +32,9 @@ describe("ImageUploader", () => {
 
   it("renders upload prompt when no preview", () => {
     renderWithProvider(<ImageUploader onInsert={noop} onEnlarge={noop} />);
-    expect(screen.getByText("Upload JPG, JPEG or PNG")).toBeInTheDocument();
+    expect(
+      screen.getByText("Upload JPG, JPEG, PNG or WebP"),
+    ).toBeInTheDocument();
   });
 
   it("selects a valid file and shows preview", async () => {
@@ -68,7 +70,9 @@ describe("ImageUploader", () => {
     fireEvent.change(input, { target: { files: [file] } });
 
     const alert = await screen.findByRole("alert");
-    expect(alert).toHaveTextContent("Only JPG, JPEG and PNG images allowed");
+    expect(alert).toHaveTextContent(
+      "Only JPG, JPEG, PNG and WebP images allowed",
+    );
   });
 
   it("shows error for file too large", async () => {
