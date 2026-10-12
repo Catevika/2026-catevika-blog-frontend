@@ -25,13 +25,22 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const validateFile = useCallback(
     (file: File): string | null => {
       const mime = (file.type || "").toLowerCase();
-      if (!mime.startsWith("image/"))
+      const extension = (file.name.split(".").pop() || "").toLowerCase();
+      const mimeFromExtension: Record<string, string> = {
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        png: "image/png",
+        webp: "image/webp",
+      };
+      const normalizedMime = mimeFromExtension[extension] || mime;
+
+      if (!normalizedMime.startsWith("image/"))
         return "Only JPG, JPEG, PNG and WebP images allowed";
 
       if (!(
-        mime === "image/jpeg" ||
-        mime === "image/png" ||
-        mime === "image/webp"
+        normalizedMime === "image/jpeg" ||
+        normalizedMime === "image/png" ||
+        normalizedMime === "image/webp"
       ))
         return "Only JPG, JPEG, PNG and WebP images allowed";
 
@@ -55,13 +64,25 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       if (preview) {
         try {
-          URL.revokeObjectURL(preview);
+          if (typeof URL !== "undefined" && typeof URL.revokeObjectURL === "function") {
+            URL.revokeObjectURL(preview);
+          }
         } catch {
           // not used
         }
       }
 
-      const blobUrl = URL.createObjectURL(file);
+      let blobUrl: string;
+      try {
+        if (typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
+          blobUrl = URL.createObjectURL(file);
+        } else {
+          blobUrl = `preview:${file.name}`;
+        }
+      } catch {
+        blobUrl = `preview:${file.name}`;
+      }
+
       setPreview(blobUrl);
       setSelectedFile(file);
       setError(null);
@@ -163,7 +184,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const reset = useCallback(() => {
     if (preview) {
       try {
-        URL.revokeObjectURL(preview);
+        if (typeof URL !== "undefined" && typeof URL.revokeObjectURL === "function") {
+          URL.revokeObjectURL(preview);
+        }
       } catch {
         // not used
       }

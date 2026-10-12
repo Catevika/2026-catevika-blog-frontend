@@ -485,9 +485,9 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(
                 remarkPlugins: [remarkGfm, remarkMath],
                 rehypePlugins: [
                   rehypeRaw,
-                  rehypeKatex,
                   rehypeSlug,
                   [rehypeSanitize, sanitizeOptions],
+                  rehypeKatex,
                 ],
                 skipHtml: false,
                 components: {

@@ -60,7 +60,18 @@ export const usePdfDownload = () => {
         .substring(0, 100);
 
       const filename = `${sanitizedTitle}.pdf`;
-      const objectUrl = URL.createObjectURL(blob);
+      const pdfBytes = await blob.arrayBuffer();
+      const safeBlob = new Blob([pdfBytes], { type: blob.type || "application/pdf" });
+
+      let objectUrl = "";
+      try {
+        objectUrl = URL.createObjectURL(safeBlob);
+      } catch {
+        const binary = Array.from(new Uint8Array(pdfBytes))
+          .map((byte) => String.fromCharCode(byte))
+          .join("");
+        objectUrl = `data:${safeBlob.type};base64,${btoa(binary)}`;
+      }
 
       const link = document.createElement("a");
       link.href = objectUrl;
@@ -69,7 +80,9 @@ export const usePdfDownload = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(objectUrl);
+      if (objectUrl.startsWith("blob:")) {
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      }
 
       console.log(`📥 PDF download triggered: ${filename}`);
     } catch (error) {

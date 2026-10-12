@@ -36,6 +36,40 @@ describe("usePdfDownload", () => {
   });
 
   describe("downloadPdf", () => {
+    it("keeps the PDF object URL available until the browser starts the download", async () => {
+      vi.useFakeTimers();
+      const createObjectUrl = vi
+        .spyOn(URL, "createObjectURL")
+        .mockReturnValue("blob:test-pdf");
+      const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
+      const clickLink = vi
+        .spyOn(HTMLAnchorElement.prototype, "click")
+        .mockImplementation(() => undefined);
+      vi.spyOn(globalThis, "fetch").mockResolvedValue(
+        new Response(new Blob(["mock pdf content"], { type: "application/pdf" }), {
+          status: 200,
+          headers: { "Content-Type": "application/pdf" },
+        }),
+      );
+
+      const { result } = renderHook(() => usePdfDownload());
+
+      await act(async () => {
+        await result.current.downloadPdf("post-1", "Test Post");
+      });
+
+      expect(createObjectUrl).toHaveBeenCalledOnce();
+      expect(clickLink).toHaveBeenCalledOnce();
+      expect(revokeObjectUrl).not.toHaveBeenCalled();
+
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      expect(revokeObjectUrl).toHaveBeenCalledWith("blob:test-pdf");
+      vi.useRealTimers();
+    });
+
     it("should successfully download PDF", async () => {
       const mockBlob = new Blob(["mock pdf content"], {
         type: "application/pdf",
