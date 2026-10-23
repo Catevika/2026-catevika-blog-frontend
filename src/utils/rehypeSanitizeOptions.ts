@@ -14,6 +14,7 @@ export const sanitizeOptions = {
     "h4",
     "h5",
     "h6",
+    "a",
     "ul",
     "ol",
     "li",

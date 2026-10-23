@@ -34,8 +34,11 @@ function normalizeHref(raw?: string): string | undefined {
   // 0) NEW: upload placeholders → keep exactly as-is
   if (isUploadPlaceholder(raw)) return raw;
 
-  // 1) In-page hashes → keep as is
-  if (isHashLink(raw)) return raw;
+  // Sanitization prefixes IDs to prevent DOM clobbering.
+  if (isHashLink(raw)) {
+    const id = raw.slice(1);
+    return `#${id.startsWith("user-content-") ? id : `user-content-${id}`}`;
+  }
 
   // 2) Relative paths → keep as is
   if (isRelativePath(raw)) return raw;

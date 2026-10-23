@@ -25,13 +25,13 @@ describe("MarkdownLink", () => {
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
 
-  it("does not add target/rel for hash links", () => {
+  it("targets sanitized heading IDs for hash links without adding target/rel", () => {
     render(<MarkdownLink href="#section">Hash Link</MarkdownLink>);
 
     const link = screen.getByRole("link");
     expect(link).not.toHaveAttribute("target");
     expect(link).not.toHaveAttribute("rel");
-    expect(link).toHaveAttribute("href", "#section");
+    expect(link).toHaveAttribute("href", "#user-content-section");
   });
 
   it("does not add target/rel for relative paths", () => {
