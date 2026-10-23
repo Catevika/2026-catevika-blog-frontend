@@ -5,11 +5,13 @@ import type { PostContentProps } from "@/types";
 import MarkdownPreview from "@uiw/react-markdown-preview/common";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeKatex from "rehype-katex";
+import rehypeSanitize from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import rehypeUnwrapImages from "rehype-unwrap-images";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkToc from "remark-toc";
+import { sanitizeOptions } from "@/utils/rehypeSanitizeOptions";
 
 const PostContent = ({ content }: PostContentProps) => {
   const { className: dataColorMode } = useTheme();
@@ -39,6 +41,7 @@ const PostContent = ({ content }: PostContentProps) => {
           rehypePlugins={[
             rehypeSlug,
             rehypeUnwrapImages,
+            [rehypeSanitize, sanitizeOptions],
             [
               rehypeAutolinkHeadings,
               {

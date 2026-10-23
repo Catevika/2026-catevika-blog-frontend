@@ -5,8 +5,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const localStorageMock = {
   getItem: vi.fn(),
   setItem: vi.fn(),
+  removeItem: vi.fn(),
   clear: vi.fn(),
 };
+
+const originalLocalStorage = Object.getOwnPropertyDescriptor(
+  window,
+  "localStorage",
+);
+const originalMatchMedia = Object.getOwnPropertyDescriptor(window, "matchMedia");
 
 describe("useTheme", () => {
   beforeEach(() => {
@@ -39,6 +46,12 @@ describe("useTheme", () => {
 
   afterEach(() => {
     cleanup();
+    if (originalLocalStorage) {
+      Object.defineProperty(window, "localStorage", originalLocalStorage);
+    }
+    if (originalMatchMedia) {
+      Object.defineProperty(window, "matchMedia", originalMatchMedia);
+    }
   });
 
   describe("initial theme", () => {
