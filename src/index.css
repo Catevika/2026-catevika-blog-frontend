@@ -12,6 +12,7 @@
 /* shadcn (their variables + components)                     */
 /* --------------------------------------------------------- */
 @import "shadcn/tailwind.css";
+@import "@uiw/react-markdown-preview/markdown.css";
 
 /* --------------------------------------------------------- */
 /* Tailwind dark variant                                     */
@@ -375,9 +376,8 @@ code {
       color: var(--foreground) !important;
     }
 
-    /* center image and caption */
-    & div > img + p {
-      @apply flex w-full items-center justify-center gap-2;
+    & .wmde-markdown p:has(> img) {
+      text-align: center;
     }
   }
 
@@ -646,6 +646,30 @@ code {
     &::-webkit-scrollbar {
       @apply hidden;
     }
+  }
+
+  .wmde-markdown ul:not(.contains-task-list) {
+    list-style-type: disc;
+  }
+
+  .wmde-markdown ul ul:not(.contains-task-list) {
+    list-style-type: circle;
+  }
+
+  .wmde-markdown ul ul ul:not(.contains-task-list) {
+    list-style-type: square;
+  }
+
+  .wmde-markdown ol {
+    list-style-type: decimal;
+  }
+
+  .wmde-markdown ol ol {
+    list-style-type: lower-alpha;
+  }
+
+  .wmde-markdown ol ol ol {
+    list-style-type: lower-roman;
   }
 
   body.modal-open {
