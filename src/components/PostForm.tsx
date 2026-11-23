@@ -40,7 +40,6 @@ import React, {
   useState,
 } from "react";
 import rehypeKatex from "rehype-katex";
-import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
@@ -484,15 +483,15 @@ const PostForm = forwardRef<PostFormHandle, PostFormProps>(
               previewOptions={{
                 remarkPlugins: [remarkGfm, remarkMath],
                 rehypePlugins: [
-                  rehypeRaw,
                   rehypeSlug,
                   [rehypeSanitize, sanitizeOptions],
                   rehypeKatex,
                 ],
-                skipHtml: false,
+                skipHtml: true,
                 components: {
                   a: MarkdownLink,
                   img: MarkdownImage,
+                  script: () => null,
                 },
               }}
               textareaProps={{

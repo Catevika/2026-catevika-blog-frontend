@@ -259,5 +259,35 @@ describe("postHooks.likeFavorites", () => {
 
       expect(fetchFavoritesPosts).toHaveBeenCalledTimes(1);
     });
+
+    it("excludes posts with zero likes", async () => {
+      const { wrapper } = createWrapper();
+      const makePost = (id: string, likeCount: number): SerializedPost => ({
+        id,
+        title: `Post ${id}`,
+        slug: `post-${id}`,
+        content: "",
+        locked: false,
+        status: "published",
+        deleted: false,
+        liked: false,
+        likedBy: [],
+        likeCount,
+        author: { id: "u1", name: "User", email: "user@example.com" },
+        createdAt: "",
+        updatedAt: "",
+      });
+
+      (fetchFavoritesPosts as Mock).mockResolvedValue({
+        docs: [makePost("zero", 0), makePost("one", 1)],
+      });
+
+      const { result } = renderHook(() => useFavoritesPosts(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.data?.docs).toHaveLength(1);
+      });
+      expect(result.current.data?.docs.map((post) => post.id)).toEqual(["one"]);
+    });
   });
 });

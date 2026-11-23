@@ -190,7 +190,7 @@ describe("postHooks — Query Hooks (API mocked)", () => {
   // FAVORITES POSTS
   describe("useFavoritesPosts", () => {
     it("returns favorites posts", async () => {
-      const posts = [makePost("1"), makePost("2")];
+      const posts = [makePost("1", 10), makePost("2", 5)];
 
       mockedPostApi.fetchFavoritesPosts.mockResolvedValueOnce({
         docs: posts,

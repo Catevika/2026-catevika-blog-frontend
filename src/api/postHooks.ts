@@ -320,6 +320,7 @@ export const useFavoritesPosts = () => {
       const data = await postApi.fetchFavoritesPosts();
       return {
         docs: [...data.docs]
+          .filter((post) => post.likeCount > 0)
           .sort((a, b) => b.likeCount - a.likeCount)
           .slice(0, 5),
       };

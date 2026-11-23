@@ -56,6 +56,7 @@ const PostContent = ({ content }: PostContentProps) => {
           components={{
             img: MarkdownImage,
             a: MarkdownLink,
+            script: () => null,
             pre({ children, ...props }) {
               return (
                 <pre {...props}>
